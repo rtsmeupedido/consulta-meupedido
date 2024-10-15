@@ -56,7 +56,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }, []);
 
     const login = async (email: string, password: string) => {
-        password = CryptoJS.AES.encrypt(password, "bHVpc2ZsYXZpb0BydW50YXNrLmNvbTpMdWlzQDIwMjA=").toString();
+        const hashPassword = import.meta.env.VITE_PASSWORD_HASH;
+        password = CryptoJS.AES.encrypt(password, hashPassword).toString();
         const data = JSON.stringify({ email, password });
         const config = {
             url: "https://api.oauth.runtask.com/api/func/get_url_by_zd",
