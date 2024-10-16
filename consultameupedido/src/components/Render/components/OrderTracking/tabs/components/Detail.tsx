@@ -2,15 +2,25 @@ import { Button, Divider } from "rtk-ux";
 import dayjs from "dayjs";
 
 export default function PackageDetail({ orderSelected }: any) {
-    console.log("🚀 ~ orderSelected:", orderSelected);
     const currency = (value: number) => {
-        return new Intl.NumberFormat("pt-BR", {
-            style: "currency",
-            currency: "BRL",
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        }).format((value || 0) / 100);
+        try {
+            return new Intl.NumberFormat("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+            }).format((value || 0) / 100);
+        } catch (error) {
+            return new Intl.NumberFormat("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+            }).format(0);
+        }
     };
+    const payments = orderSelected?.paymentData?.transactions?.[0]?.payments || [];
+    const giftCards = (orderSelected?.paymentData?.giftCards || [])?.filter((g: any) => g?.inUse);
 
     return (
         <div className="flex flex-col pb-3 text-xs">
@@ -53,21 +63,41 @@ export default function PackageDetail({ orderSelected }: any) {
                 </Row>
                 <Row>
                     <RowItem field="Chave:" value={orderSelected?.packageAttachment?.packages?.[0]?.invoiceKey} />
-                    <RowItem field="Total:" value={currency(orderSelected?.paymentData?.transactions?.[0]?.payments?.[0].value)} />
+                    <RowItem field="Total:" value={currency(orderSelected?.value)} />
                 </Row>
-                <Row>
-                    <RowItem field="Método:" value={"Cartão de crédito"} />
-                    <RowItem field="TID:" value={orderSelected?.paymentData?.transactions?.[0]?.payments?.[0].connectorResponses?.Tid} />
-                </Row>
-                <Row>
-                    <RowItem
-                        field="Parcelas:"
-                        value={`${orderSelected?.paymentData?.transactions?.[0]?.payments?.[0].installments || 1}x ${currency(
-                            orderSelected?.paymentData?.transactions?.[0]?.payments?.[0].value / (orderSelected?.paymentData?.transactions?.[0]?.payments?.[0].installments || 1)
-                        )}`}
-                    />
-                    <RowItem field="NSU:" value={orderSelected?.paymentData?.transactions?.[0]?.payments?.[0].connectorResponses?.nsu} />
-                </Row>
+                {payments?.length > 0 && (
+                    <>
+                        <div className="my-1" />
+                        <Info title="Métodos de pagamento utilizados">
+                            {payments.map((pay: any) => (
+                                <div className="border-b py-1 border-b-slate-100">
+                                    <Row>
+                                        <RowItem field="Método:" value={pay?.paymentSystemName} />
+                                        {/* <RowItem field="TID:" value={pay?.connectorResponses?.Tid} /> */}
+                                        <RowItem field="Valor:" value={currency(pay?.value)} />
+                                    </Row>
+                                    {pay?.group === "creditCard" && (
+                                        <Row>
+                                            <RowItem field="Parcelas:" value={`${pay?.installments || 1}x ${currency(orderSelected?.value / (pay?.installments || 1))}`} />
+                                            {/* <RowItem field="NSU:" value={pay?.connectorResponses?.nsu} /> */}
+                                        </Row>
+                                    )}
+                                </div>
+                            ))}
+                        </Info>
+                    </>
+                )}
+                <div className="my-1" />
+                {giftCards?.length > 0 && (
+                    <Info title="Gift cards">
+                        {giftCards?.map((gift: any) => (
+                            <Row key={gift?.id}>
+                                <RowItem field="Descrição:" value={gift?.caption} />
+                                <RowItem field="Valor:" value={currency(gift?.value)} />
+                            </Row>
+                        ))}
+                    </Info>
+                )}
             </Info>
             <Divider className="my-6" />
             <Info title="Entrega">

@@ -27,6 +27,7 @@ export default function Tab({ order }: any) {
                     key: "package-tracking",
                     children: (
                         <div
+                            className="overflow-auto"
                             style={{
                                 height: "calc(100vh - 150px)",
                             }}
