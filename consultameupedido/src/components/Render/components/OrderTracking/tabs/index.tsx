@@ -1,5 +1,5 @@
 import { Tabs } from "rtk-ux";
-import LiveEvents from "./live_events";
+import LiveEvents from "./components/LiveEvents";
 import PackageDetail from "./components/Detail";
 
 export default function Tab({ order }: any) {

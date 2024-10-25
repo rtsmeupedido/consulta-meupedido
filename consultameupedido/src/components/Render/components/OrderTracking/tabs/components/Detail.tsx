@@ -1,5 +1,6 @@
-import { Button, Divider } from "rtk-ux";
+import { Button, Divider, MuiIcon, Tooltip } from "rtk-ux";
 import dayjs from "dayjs";
+import { parsePackageStatus } from "../../../../utils";
 
 export default function PackageDetail({ orderSelected }: any) {
     const currency = (value: number) => {
@@ -37,16 +38,20 @@ export default function PackageDetail({ orderSelected }: any) {
             <Divider className="my-6" />
             <Info title="Pedido">
                 <Row>
-                    <RowItem field="Id:" value={orderSelected?.orderId} />
-                    <RowItem field="Status:" value={orderSelected?.statusDescription} />
+                    <RowItem field="Id:" value={orderSelected?.orderId} copy />
+                    <RowItem field="Status:" value={parsePackageStatus(orderSelected?._last_status?.name)} />
                 </Row>
                 <Row>
-                    <RowItem field="Seq:" value={orderSelected?.sequence} />
-                    <RowItem field="Transp:" value={orderSelected?.shippingData?.logisticsInfo?.[0]?.deliveryCompany} />
+                    <RowItem field="Data:" value={dayjs(orderSelected?.creationDate).format("DD/MM/YYYY HH:mm")} />
+                    <RowItem field="Seller:" value={orderSelected?.sellers?.[0]?.name || orderSelected?.sellers?.[0]?.id} />
                 </Row>
                 <Row>
-                    <RowItem field="Data:" value="08/02/2022 10:35" />
                     <RowItem field="Canal:" value={orderSelected?.shippingData?.logisticsInfo?.[0]?.deliveryChannel} />
+                    <RowItem field="Transp:" value={orderSelected?.shippingData?.logisticsInfo?.[0]?.deliveryCompany || parsePackageStatus(orderSelected?.transportadora)} url={orderSelected?.tracking_url} />
+                </Row>
+                <Row>
+                    <RowItem field="Origem:" value={orderSelected?.__source} />
+                    <RowItem field="Rastreio:" value={orderSelected?.tracking_code} />
                 </Row>
             </Info>
             <Divider className="my-6" />
@@ -58,11 +63,11 @@ export default function PackageDetail({ orderSelected }: any) {
             <Divider className="my-6" />
             <Info title="Pagamento">
                 <Row>
-                    <RowItem field="NF:" value={orderSelected?.packageAttachment?.packages?.[0]?.invoiceNumber} />
+                    <RowItem field="NF:" value={orderSelected?.packageAttachment?.packages?.[0]?.invoiceNumber} copy />
                     <RowItem field="Data:" value={dayjs(orderSelected?.creationDate).format("DD/MM/YYYY")} />
                 </Row>
                 <Row>
-                    <RowItem field="Chave:" value={orderSelected?.packageAttachment?.packages?.[0]?.invoiceKey} />
+                    <RowItem field="Chave:" value={orderSelected?.packageAttachment?.packages?.[0]?.invoiceKey} copy />
                     <RowItem field="Total:" value={currency(orderSelected?.value)} />
                 </Row>
                 {payments?.length > 0 && (
@@ -70,16 +75,24 @@ export default function PackageDetail({ orderSelected }: any) {
                         <div className="my-1" />
                         <Info title="Métodos de pagamento utilizados">
                             {payments.map((pay: any) => (
-                                <div className="border-b py-1 border-b-slate-100">
+                                <div className="flex flex-col gap-1 border-b py-1 border-b-slate-100">
                                     <Row>
                                         <RowItem field="Método:" value={pay?.paymentSystemName} />
                                         {/* <RowItem field="TID:" value={pay?.connectorResponses?.Tid} /> */}
                                         <RowItem field="Valor:" value={currency(pay?.value)} />
                                     </Row>
+                                    {pay?.connectorResponses?.acquirer && (
+                                        <>
+                                            <Row>
+                                                <RowItem field="Adquirente:" value={pay?.connectorResponses?.acquirer} />
+                                                {/* <RowItem field="TID:" value={pay?.connectorResponses?.Tid} /> */}
+                                                <RowItem field="NSU:" value={pay?.connectorResponses?.nsu} copy />
+                                            </Row>
+                                        </>
+                                    )}
                                     {pay?.group === "creditCard" && (
                                         <Row>
                                             <RowItem field="Parcelas:" value={`${pay?.installments || 1}x ${currency(orderSelected?.value / (pay?.installments || 1))}`} />
-                                            {/* <RowItem field="NSU:" value={pay?.connectorResponses?.nsu} /> */}
                                         </Row>
                                     )}
                                 </div>
@@ -106,16 +119,11 @@ export default function PackageDetail({ orderSelected }: any) {
                 </Row>
                 <Row>
                     <RowItem field="End:" value={orderSelected ? `${orderSelected?.shippingData?.address?.street}, ${orderSelected?.shippingData?.address?.number}` : "-"} />
+                    <RowItem field="CEP:" value={orderSelected?.shippingData?.address?.postalCode} />
                 </Row>
                 <Row>
                     <RowItem field="Compl:" value={orderSelected?.shippingData?.address?.complement} />
-                </Row>
-                <Row>
                     <RowItem field="Cidade:" value={orderSelected ? `${orderSelected?.shippingData?.address?.city} - ${orderSelected?.shippingData?.address?.state}` : "-"} />
-                </Row>
-                <Row>
-                    <RowItem field="Transp:" value={orderSelected?.shippingData?.logisticsInfo?.[0]?.deliveryCompany} />
-                    <RowItem field="Status transp:" value={orderSelected?.status_keyname} />
                 </Row>
             </Info>
         </div>
@@ -133,11 +141,32 @@ const Info = ({ title = "", children }: any) => {
 const Row = ({ children }: any) => {
     return <div className="flex items-center mb-1">{children}</div>;
 };
-const RowItem = ({ field = "", value = "" }) => {
+const RowItem = ({ field = "", value = "", copy = false, url = null }) => {
     return (
-        <div className="flex items-center w-1/2 gap-1">
+        <div className="flex items-center w-1/2">
             <div className="min-w-14 text-gray-400">{field}</div>
-            <div className="font-semibold overflow-hidden overflow-ellipsis">{value || "-"}</div>
+            <div className="font-semibold overflow-hidden overflow-ellipsis ml-1">{value || "-"}</div>
+            {value && url && (
+                <MuiIcon
+                    icon={["mui", "link"]}
+                    className="cursor-pointer mr-1 text-blue-600"
+                    onClick={() => {
+                        window.open(value, "__blank");
+                    }}
+                />
+            )}
+            {value && copy && (
+                <Tooltip title="Copiar">
+                    <MuiIcon
+                        icon={["mui", "copy_all"]}
+                        width={10}
+                        className="text-gray-500 hover:text-orange-500 cursor-pointer mr-1"
+                        onClick={() => {
+                            navigator.clipboard.writeText(value);
+                        }}
+                    />
+                </Tooltip>
+            )}
         </div>
     );
 };

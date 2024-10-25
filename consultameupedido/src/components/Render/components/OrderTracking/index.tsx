@@ -7,6 +7,7 @@ import { Button, MuiIcon, Input, Loader, Table } from "rtk-ux";
 import dayjs from "dayjs";
 import Tab from "./tabs";
 import { useAuth } from "../../hooks/useAuth";
+import { parseFilter, parsePackageStatus } from "../../utils";
 
 export default function OrderTracking() {
     const zafClient = useZaf();
@@ -28,37 +29,10 @@ export default function OrderTracking() {
         setLoading(true);
         const getItems = async (doc: string) => {
             const textFilter: string = doc ? doc : text;
-            const parseFilter = () => {
-                const regex = /^\d+$/;
-                const isNumber = regex.test(textFilter);
-                try {
-                    if (textFilter?.length === 11) {
-                        return {
-                            "clientProfileData.document": textFilter,
-                        };
-                    } else if (isNumber) {
-                        return {
-                            "clientProfileData.phone": {
-                                $regex: textFilter,
-                                $options: "i",
-                            },
-                        };
-                    } else {
-                        return {
-                            _id: textFilter,
-                        };
-                    }
-                } catch (error) {
-                    return {
-                        _id: textFilter,
-                    };
-                }
-            };
-
             return await list(
                 "mp_packages_last_status",
                 {
-                    before_filter: parseFilter(),
+                    before_filter: parseFilter(textFilter),
                 },
                 {},
                 "query"
@@ -167,7 +141,11 @@ export default function OrderTracking() {
                                             title: "Status",
                                             align: "center",
                                             width: 190,
-                                            render: (info, rowData) => <div onClick={() => console.log(info)}>{rowData?._last_status?.name || "-"}</div>,
+                                            render: (info, rowData) => (
+                                                <div onClick={() => console.log(info)} className="capitalize">
+                                                    {parsePackageStatus(rowData?._last_status?.name || "-")}
+                                                </div>
+                                            ),
                                         },
                                     ]}
                                 />

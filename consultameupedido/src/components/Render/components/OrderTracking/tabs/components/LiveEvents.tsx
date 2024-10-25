@@ -19,7 +19,7 @@ export default function LiveEvents({ order }: any) {
                 return item;
             });
         }
-        let group = agruparPorStatus(pck).reduce((r: any, a: any) => {
+        const group = agruparPorStatus(pck).reduce((r: any, a: any) => {
             r[a?.fase] = [...(r[a?.fase] || []), a];
             return r;
         }, {});
@@ -63,17 +63,20 @@ export default function LiveEvents({ order }: any) {
                                         },
                                         label: <span className="capitalize mt-1 mb-1 text-xs text-gray-600 font-normal">{rowData?.name || ""}</span>,
                                         children: (
-                                            <div className="flex flex-col gap-1">
+                                            <div className="flex flex-col gap-2">
                                                 {(rowData?.events || [])?.map((event: any) => {
                                                     const rowValid = event?.system_event_name;
                                                     return (
-                                                        <div key={event._id} className={`text-xs flex items-center ${rowValid ? "text-black" : "text-gray-400"}`}>
-                                                            <div className="flex items-center w-1/2">
-                                                                <div className="text-nowrap">{dayjs(event?.event_date).format("D [de] MMM., HH:mm")}</div>
+                                                        <div key={event._id} className={`text-xs flex ${rowValid ? "text-black" : "text-gray-400"}`}>
+                                                            <div className="flex w-1/2">
+                                                                <div className="text-nowrap w-28 shrink-0">{dayjs(event?.event_date).format("D [de] MMM., HH:mm")}</div>
                                                                 <Divider type="vertical" className="h-4" />
-                                                                <div className="line-clamp-1">{event?.system_event_name?.replace(/{{(\w+)}}/g, (_: any, key: any) => event[key])}</div>
+                                                                <div className="flex flex-col w-full">
+                                                                    <div className="line-clamp-1">{event?.system_event_name ? event?.system_event_name?.replace(/{{(\w+)}}/g, (_: any, key: any) => event[key]) : "-"}</div>
+                                                                    {event?.system_event_name && event?.carrier_node && event?.carrier_node !== "carrier_node" && <div className=" text-xs text-gray-500">{event?.carrier_node}</div>}
+                                                                </div>
                                                             </div>
-                                                            <div className="flex items-center gap-3 w-1/2">
+                                                            <div className="flex gap-3 w-1/2">
                                                                 <Tooltip title={event?.api_event_name}>
                                                                     <div className={"w-56 line-clamp-1 lowercase"}>{event?.api_event_name}</div>
                                                                 </Tooltip>
