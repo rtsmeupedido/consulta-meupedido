@@ -15,7 +15,7 @@ export default function Tab({ order }: any) {
                         <div
                             className="overflow-auto px-2"
                             style={{
-                                height: "calc(100vh - 150px)",
+                                height: "calc(100vh - 200px)",
                             }}
                         >
                             <PackageDetail orderSelected={order} />
@@ -29,7 +29,7 @@ export default function Tab({ order }: any) {
                         <div
                             className="overflow-auto"
                             style={{
-                                height: "calc(100vh - 150px)",
+                                height: "calc(100vh - 200px)",
                             }}
                         >
                             <LiveEvents order={order} />

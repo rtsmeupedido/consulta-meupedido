@@ -2,16 +2,12 @@
 import { useEffect, useState } from "react";
 import * as Style from "./styles";
 import { list } from "../../api";
-import { useZaf } from "../../hooks/useZaf";
 import { Button, MuiIcon, Input, Loader, Table } from "rtk-ux";
 import dayjs from "dayjs";
 import Tab from "./tabs";
-import { useAuth } from "../../hooks/useAuth";
 import { parseFilter, parsePackageStatus } from "../../utils";
 
 export default function OrderTracking() {
-    const zafClient = useZaf();
-    const { logout } = useAuth();
     const [text, setText] = useState("");
     const [orders, setOrders] = useState([]);
     const [brands, setBrands] = useState<any>([]);
@@ -63,29 +59,18 @@ export default function OrderTracking() {
             });
     };
 
-    async function init() {
-        //@ts-ignore
-        const t: any = await zafClient.zafClient?.get("viewport.size");
-        zafClient.zafClient?.invoke("resize", { width: (t?.["viewport.size"].width || 1000) * 0.85, height: (t?.["viewport.size"].height || 600) - 150 });
-    }
     useEffect(() => {
         getBrands();
-        init();
     }, []);
 
     return (
         <Style.Container>
             <Style.Style className={`w-full h-full`}>
-                <div className="flex gap-2 flex-col flex-1 p-4 pt-2 overflow-hidden">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1">
-                            <Input className="w-72 h-8" placeholder="Ex: email, CPF, pacote, pedido, telefone" value={text} onChange={(e: any) => setText(e.target.value)} />
-                            <Button onClick={() => handleFilter(text)}>
-                                <MuiIcon icon={["mui", "search"]} color="black" />
-                            </Button>
-                        </div>
-                        <Button onClick={() => logout()} danger>
-                            Sair
+                <div className="flex gap-2 flex-col flex-1 overflow-hidden">
+                    <div className="flex items-center gap-1">
+                        <Input className="w-72 h-8" placeholder="Ex: email, CPF, pacote, pedido, telefone" value={text} onChange={(e: any) => setText(e.target.value)} />
+                        <Button onClick={() => handleFilter(text)}>
+                            <MuiIcon icon={["mui", "search"]} color="black" />
                         </Button>
                     </div>
                     <div className="flex border flex-1 h-full overflow-hidden">

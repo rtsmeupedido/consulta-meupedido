@@ -1,8 +1,9 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 import * as CryptoJS from "crypto-js";
-import api from "../api";
+import api, { checkAuth } from "../api";
 import { useZaf } from "./useZaf";
+import { Loader } from "rtk-ux";
 
 interface UserType {
     name: string;
@@ -37,23 +38,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<UserType | null>(null);
     const [token, setToken] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
+    const [loadingAuth, setLoadingAuth] = useState<boolean>(true);
     const [uri, setUri] = useState<string>("");
     const [error, setError] = useState<Error | null>(null);
     const [originator, setOriginator] = useState<string>("");
 
     const zafClient = useZaf();
-
-    useEffect(() => {
-        const savedUser = localStorage.getItem("@name-tck-meupedido-zendesk");
-        const savedUserId = localStorage.getItem("@id-tck-meupedido-zendesk");
-        const getToken = localStorage.getItem("@token-tck-meupedido-zendesk");
-        const getUri = localStorage.getItem("@uri-tck-meupedido-zendesk");
-        if (savedUser && savedUserId && getToken && getUri) {
-            setUser({ name: savedUser, _id: Number(savedUserId) });
-            setToken(getToken);
-            setUri(getUri);
-        }
-    }, []);
 
     const login = async (email: string, password: string) => {
         const hashPassword = import.meta.env.VITE_PASSWORD_HASH;
@@ -102,16 +92,38 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             setLoading(false);
         }
     };
-
     const logout = () => {
-        localStorage.removeItem("@name-tck-meupedido-zendesk");
-        localStorage.removeItem("@id-tck-meupedido-zendesk");
-        localStorage.removeItem("@token-tck-meupedido-zendesk");
-        localStorage.removeItem("@organizations_id-tck-meupedido-zendesk");
-        localStorage.removeItem("@uri-tck-meupedido-zendesk");
+        localStorage.clear();
         setUser(null);
         setToken("");
     };
+
+    useEffect(() => {
+        const savedUser = localStorage.getItem("@name-tck-meupedido-zendesk");
+        const savedUserId = localStorage.getItem("@id-tck-meupedido-zendesk");
+        const getToken = localStorage.getItem("@token-tck-meupedido-zendesk");
+        const getUri = localStorage.getItem("@uri-tck-meupedido-zendesk");
+        if (savedUser && savedUserId && getToken && getUri) {
+            setLoadingAuth(true);
+            checkAuth(getToken)
+                .then((isSuccess) => {
+                    setLoadingAuth(false);
+                    if (!isSuccess) {
+                        logout();
+                        return;
+                    }
+                    setUser({ name: savedUser, _id: Number(savedUserId) });
+                    setToken(getToken);
+                    setUri(getUri);
+                })
+                .catch(() => {
+                    setLoadingAuth(false);
+                    logout();
+                });
+        } else {
+            setLoadingAuth(false);
+        }
+    }, []);
 
     useEffect(() => {
         if (!token) return;
@@ -147,7 +159,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 setOriginator,
             }}
         >
-            {children}
+            {loadingAuth ? <Loader center /> : children}
         </AuthContext.Provider>
     );
 };

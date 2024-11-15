@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Input } from "rtk-ux";
 import { useAuth } from "../../hooks/useAuth";
-import logo from "../../../../assets/logoruntask-m.png";
+import logo from "../../../../assets/logoruntask-m.svg";
 const LoginPage = () => {
     const { user, token } = useAuth();
     const [email, setEmail] = useState("");
@@ -30,7 +30,7 @@ const LoginPage = () => {
     return (
         <div className="flex flex-col items-center justify-center h-screen">
             <div className="h-1/3 w-full flex items-center justify-center">
-                <img src={logo} width={150} className="mb-4" />
+                <img src={logo} className="h-12" />
             </div>
             <div className="h-1/2 w-1/3">
                 <form onSubmit={handleSubmit} className="flex items-center flex-col gap-4 flex-1 h-full px-4">

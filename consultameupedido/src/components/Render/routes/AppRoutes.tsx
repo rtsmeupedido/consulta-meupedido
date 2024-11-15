@@ -1,12 +1,10 @@
 import { HashRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "../hooks/useAuth";
 import LoginPage from "../pages/LoginPage";
-
 import PrivateRoute from "./PrivateRoute";
-import OrderTracking from "../components/OrderTracking";
+import Home from "../pages/Home";
 
 const AppRoutes = () => {
-    console.log("1002222");
     return (
         <AuthProvider>
             <HashRouter>
@@ -16,7 +14,7 @@ const AppRoutes = () => {
                         path="/home"
                         element={
                             <PrivateRoute>
-                                <OrderTracking />
+                                <Home />
                             </PrivateRoute>
                         }
                     />
