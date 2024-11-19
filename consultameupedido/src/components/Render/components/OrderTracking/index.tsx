@@ -7,7 +7,7 @@ import dayjs from "dayjs";
 import Tab from "./tabs";
 import { parseFilter, parsePackageStatus } from "../../utils";
 
-export default function OrderTracking() {
+export default function OrderTracking({ onGetNf }: { onGetNf: (str: string) => void }) {
     const [text, setText] = useState("");
     const [orders, setOrders] = useState([]);
     const [brands, setBrands] = useState<any>([]);
@@ -69,7 +69,7 @@ export default function OrderTracking() {
                 <div className="flex gap-2 flex-col flex-1 overflow-hidden">
                     <div className="flex items-center gap-1">
                         <Input className="w-72 h-8" placeholder="Ex: email, CPF, pacote, pedido, telefone" value={text} onChange={(e: any) => setText(e.target.value)} />
-                        <Button onClick={() => handleFilter(text)}>
+                        <Button onClick={() => handleFilter(text)} disabled={!text?.length}>
                             <MuiIcon icon={["mui", "search"]} color="black" />
                         </Button>
                     </div>
@@ -136,7 +136,9 @@ export default function OrderTracking() {
                                 />
                             )}
                         </div>
-                        <div className="flex w-1/2 h-full px-3 overflow-hidden">{orderSelected?.orderId ? <Tab order={orderSelected} /> : <div className="flex items-center justify-center flex-1">Nenhum pacote selecionado</div>}</div>
+                        <div className="flex w-1/2 h-full px-3 overflow-hidden">
+                            {orderSelected?.orderId ? <Tab order={orderSelected} onGetNf={onGetNf} /> : <div className="flex items-center justify-center flex-1">Nenhum pacote selecionado</div>}
+                        </div>
                     </div>
                 </div>
             </Style.Style>

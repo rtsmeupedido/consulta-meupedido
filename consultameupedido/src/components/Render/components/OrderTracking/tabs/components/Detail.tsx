@@ -2,7 +2,7 @@ import { Button, Divider, MuiIcon, Tooltip } from "rtk-ux";
 import dayjs from "dayjs";
 import { parsePackageStatus } from "../../../../utils";
 
-export default function PackageDetail({ orderSelected }: any) {
+export default function PackageDetail({ orderSelected, onGetNf }: { orderSelected: any; onGetNf: (str: string) => void }) {
     const currency = (value: number) => {
         try {
             return new Intl.NumberFormat("pt-BR", {
@@ -67,7 +67,7 @@ export default function PackageDetail({ orderSelected }: any) {
                     <RowItem field="Data:" value={dayjs(orderSelected?.creationDate).format("DD/MM/YYYY")} />
                 </Row>
                 <Row>
-                    <RowItem field="Chave:" value={orderSelected?.packageAttachment?.packages?.[0]?.invoiceKey} copy />
+                    <RowItem field="Chave:" value={orderSelected?.packageAttachment?.packages?.[0]?.invoiceKey} copy nf onNf={() => onGetNf(orderSelected?.packageAttachment?.packages?.[0]?.invoiceKey)} />
                     <RowItem field="Total:" value={currency(orderSelected?.value)} />
                 </Row>
                 {payments?.length > 0 && (
@@ -141,7 +141,7 @@ const Info = ({ title = "", children }: any) => {
 const Row = ({ children }: any) => {
     return <div className="flex items-center mb-1">{children}</div>;
 };
-const RowItem = ({ field = "", value = "", copy = false, url = null }) => {
+const RowItem = ({ field = "", value = "", copy = false, url = null, nf = false, onNf = () => {} }) => {
     return (
         <div className="flex items-center w-1/2">
             <div className="min-w-14 text-gray-400">{field}</div>
@@ -163,6 +163,18 @@ const RowItem = ({ field = "", value = "", copy = false, url = null }) => {
                         className="text-gray-500 hover:text-orange-500 cursor-pointer mr-1"
                         onClick={() => {
                             navigator.clipboard.writeText(value);
+                        }}
+                    />
+                </Tooltip>
+            )}
+            {value && nf && (
+                <Tooltip title="Baixar nota fiscal">
+                    <MuiIcon
+                        icon={["mui", "remove_red_eye"]}
+                        width={10}
+                        className="text-gray-500 hover:text-orange-500 cursor-pointer mr-1"
+                        onClick={() => {
+                            onNf();
                         }}
                     />
                 </Tooltip>

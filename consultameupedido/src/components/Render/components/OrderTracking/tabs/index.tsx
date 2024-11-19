@@ -1,8 +1,7 @@
 import { Tabs } from "rtk-ux";
 import LiveEvents from "./components/LiveEvents";
 import PackageDetail from "./components/Detail";
-
-export default function Tab({ order }: any) {
+export default function Tab({ order, onGetNf }: { order: any; onGetNf: (str: string) => void }) {
     return (
         <Tabs
             defaultActiveKey="1"
@@ -18,7 +17,7 @@ export default function Tab({ order }: any) {
                                 height: "calc(100vh - 200px)",
                             }}
                         >
-                            <PackageDetail orderSelected={order} />
+                            <PackageDetail orderSelected={order} onGetNf={onGetNf} />
                         </div>
                     ),
                 },

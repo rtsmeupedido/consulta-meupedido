@@ -39,7 +39,7 @@ export default function ProductDetails() {
                 <div className="flex gap-2 flex-col flex-1">
                     <div className="flex items-center gap-1">
                         <Input className="w-72 h-8" placeholder="Referência" value={text} onChange={(e: any) => setText(e.target.value)} />
-                        <Button onClick={() => handleFilter(text)} loading={loading}>
+                        <Button onClick={() => handleFilter(text)} loading={loading} disabled={!text?.length}>
                             <MuiIcon icon={["mui", "search"]} color="black" />
                         </Button>
                     </div>

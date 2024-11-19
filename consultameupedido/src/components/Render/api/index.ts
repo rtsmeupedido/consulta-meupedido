@@ -112,6 +112,14 @@ export const addSystemLog = (data?: { datasource: string; user: string | number 
         });
     });
 };
+export const downloadNf = (url: string, fileName: string) => {
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+};
 export const checkAuth = (token: string) => {
     return new Promise((resolve, reject) => {
         const url = "/auth/check";
