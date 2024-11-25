@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { useRef, useState } from "react";
 import * as Style from "./styles";
-import { Button, MuiIcon, Input, Table, Divider } from "rtk-ux";
+import { Table, Divider } from "rtk-ux";
 import { execFunc } from "../../api";
+import HeaderSearch from "../HeaderSearch";
 export default function ProductDetails() {
     const div_ref = useRef<any>(null);
     const [loading, setLoading] = useState(false);
-    const [text, setText] = useState("");
     const [product, setProduct] = useState<any>(null);
     const [productInfo, setProductInfo] = useState<any>({ info: null, price: null, color: null });
     const [stocks, setStocks] = useState<any>([]);
@@ -37,12 +37,7 @@ export default function ProductDetails() {
         <Style.Container>
             <Style.Style className={`w-full h-full overflow-auto`} ref={div_ref}>
                 <div className="flex gap-2 flex-col flex-1">
-                    <div className="flex items-center gap-1">
-                        <Input className="w-72 h-8" placeholder="Referência" value={text} onChange={(e: any) => setText(e.target.value)} />
-                        <Button onClick={() => handleFilter(text)} loading={loading} disabled={!text?.length}>
-                            <MuiIcon icon={["mui", "search"]} color="black" />
-                        </Button>
-                    </div>
+                    <HeaderSearch placeholder="Referência" onChange={(text) => handleFilter(text)} loading={loading} />
                     {productInfo?.info && (
                         <div className="pl-2 flex flex-col gap-2 mb-2">
                             <Divider className="my-1" />

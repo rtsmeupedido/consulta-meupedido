@@ -7,7 +7,8 @@ import { useZaf } from "../../hooks/useZaf";
 import { useAuth } from "../../hooks/useAuth";
 import { message } from "antd";
 import Devolution from "../../components/Devolution";
-import { downloadNf, execFunc } from "../../api";
+import { downloadNf, execFunc, list } from "../../api";
+import DevolutionRequest from "../../components/DevolutionRequest";
 
 const Home = () => {
     const keyMsg = "msg-order-updatable";
@@ -15,6 +16,7 @@ const Home = () => {
     const zafClient = useZaf();
     const { logout } = useAuth();
     const [showLogout, setShowLogout] = useState(false);
+    const [brands, setBrands] = useState<any>([]);
     const [active, setActive] = useState("order");
 
     async function onGetNf(key: string) {
@@ -61,8 +63,21 @@ const Home = () => {
         const t: any = await zafClient.zafClient?.get("viewport.size");
         zafClient.zafClient?.invoke("resize", { width: (t?.["viewport.size"].width || 1000) * 0.85, height: (t?.["viewport.size"].height || 600) - 150 });
     }
+
+    const getBrands = async () => {
+        return await list("mp_brands")
+            .then(({ data, success }: { data: any; success: boolean }) => {
+                if (!success) return;
+                setBrands(data);
+            })
+            .catch(function (error: any) {
+                console.log(error);
+            });
+    };
+
     useEffect(() => {
         init();
+        getBrands();
     }, []);
 
     return (
@@ -70,15 +85,12 @@ const Home = () => {
             {contextHolder}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <Button icon={<MuiIcon icon={["muil", "shopping_bag"]} color={active === "order" ? "white" : "black"} />} onClick={() => setActive("order")} type={active === "order" ? "primary" : "default"}>
-                        Pacotes
-                    </Button>
-                    <Button icon={<MuiIcon icon={["muil", "dry_cleaning"]} color={active === "product" ? "white" : "black"} />} onClick={() => setActive("product")} type={active === "product" ? "primary" : "default"}>
-                        Produtos
-                    </Button>
-                    <Button icon={<MuiIcon icon={["muil", "rotate_90_degrees_ccw"]} color={active === "devolution" ? "white" : "black"} />} onClick={() => setActive("devolution")} type={active === "devolution" ? "primary" : "default"}>
-                        Devolução
-                    </Button>
+                    {tabs.map((tab) => (
+                        // @ts-ignore
+                        <Button icon={<MuiIcon icon={tab.icon} color={active === tab.keyname ? "white" : "black"} />} onClick={() => setActive(tab.keyname)} type={active === tab.keyname ? "primary" : "default"}>
+                            {tab.name}
+                        </Button>
+                    ))}
                 </div>
                 <Button icon={<MuiIcon icon={["mui", "logout"]} color="white" />} className="bg-gray-400 hover:bg-gray-500 text-white" type="text" onClick={() => setShowLogout(true)}>
                     Fazer logoff
@@ -86,13 +98,16 @@ const Home = () => {
             </div>
             <Divider className="my-1" />
             <div className={active === "order" ? "block" : "hidden"}>
-                <OrderTracking onGetNf={onGetNf} />
+                <OrderTracking onGetNf={onGetNf} brands={brands} />
             </div>
             <div className={active === "product" ? "block" : "hidden"}>
                 <ProductDetails />
             </div>
             <div className={active === "devolution" ? "block" : "hidden"}>
-                <Devolution onGetNf={onGetNf} />
+                <Devolution onGetNf={onGetNf} brands={brands} />
+            </div>
+            <div className={active === "request_devolution" ? "block" : "hidden"}>
+                <DevolutionRequest brands={brands} />
             </div>
             <Modal
                 centered
@@ -117,3 +132,10 @@ const Home = () => {
 };
 
 export default Home;
+
+const tabs = [
+    { name: "Pacotes", keyname: "order", icon: ["muil", "shopping_bag"] },
+    { name: "Produtos", keyname: "product", icon: ["muil", "dry_cleaning"] },
+    { name: "Troquecommerce", keyname: "request_devolution", icon: ["muil", "youtube_searched_for"] },
+    { name: "Devolução bipada", keyname: "devolution", icon: ["muil", "rotate_90_degrees_ccw"] },
+];

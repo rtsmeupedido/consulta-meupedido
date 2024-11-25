@@ -1,16 +1,15 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import * as Style from "./styles";
 import { list } from "../../api";
-import { Button, MuiIcon, Input, Loader, Table } from "rtk-ux";
+import { Loader, Table } from "rtk-ux";
 import dayjs from "dayjs";
 import Tab from "./tabs";
 import { parseFilter, parsePackageStatus } from "../../utils";
+import HeaderSearch from "../HeaderSearch";
 
-export default function OrderTracking({ onGetNf }: { onGetNf: (str: string) => void }) {
-    const [text, setText] = useState("");
+export default function OrderTracking({ onGetNf, brands }: { onGetNf: (str: string) => void; brands: any }) {
     const [orders, setOrders] = useState([]);
-    const [brands, setBrands] = useState<any>([]);
     const [loading, setLoading] = useState(false);
     const [orderSelected, setOrderSelected] = useState<any>(null);
 
@@ -48,31 +47,11 @@ export default function OrderTracking({ onGetNf }: { onGetNf: (str: string) => v
         await getItems("");
     };
 
-    const getBrands = async () => {
-        return await list("mp_brands")
-            .then(({ data, success }: { data: any; success: boolean }) => {
-                if (!success) return;
-                setBrands(data);
-            })
-            .catch(function (error: any) {
-                console.log(error);
-            });
-    };
-
-    useEffect(() => {
-        getBrands();
-    }, []);
-
     return (
         <Style.Container>
             <Style.Style className={`w-full h-full`}>
                 <div className="flex gap-2 flex-col flex-1 overflow-hidden">
-                    <div className="flex items-center gap-1">
-                        <Input className="w-72 h-8" placeholder="Ex: email, CPF, pacote, pedido, telefone" value={text} onChange={(e: any) => setText(e.target.value)} />
-                        <Button onClick={() => handleFilter(text)} disabled={!text?.length}>
-                            <MuiIcon icon={["mui", "search"]} color="black" />
-                        </Button>
-                    </div>
+                    <HeaderSearch placeholder="Ex: email, CPF, pacote, pedido, telefone " onChange={(text) => handleFilter(text)} loading={loading} />
                     <div className="flex border flex-1 h-full overflow-hidden">
                         <div className="border-r w-1/2 overflow-auto">
                             {loading ? (

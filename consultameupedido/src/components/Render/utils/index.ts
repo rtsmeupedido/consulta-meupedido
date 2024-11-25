@@ -1,38 +1,77 @@
-export const parseFilter = (textFilter: string) => {
+export const parseFilter = (textFilter: string, returnType: boolean = false) => {
     const regex = /^\d+$/;
     const isNumber = regex.test(textFilter);
     try {
         if (textFilter?.length === 11) {
-            return {
-                $or: [
-                    {
-                        "clientProfileData.document": textFilter,
-                    },
-                    {
-                        orderGroup: textFilter,
-                    },
-                ],
-            };
+            return returnType
+                ? {
+                      type: "document",
+                      filter: {
+                          $or: [
+                              {
+                                  "clientProfileData.document": textFilter,
+                              },
+                              {
+                                  orderGroup: textFilter,
+                              },
+                          ],
+                      },
+                  }
+                : {
+                      $or: [
+                          {
+                              "clientProfileData.document": textFilter,
+                          },
+                          {
+                              orderGroup: textFilter,
+                          },
+                      ],
+                  };
         } else if (isNumber) {
-            return {
-                "clientProfileData.phone": {
-                    $regex: textFilter,
-                    $options: "i",
-                },
-            };
+            return returnType
+                ? {
+                      type: "phone",
+                      filter: {
+                          "clientProfileData.phone": {
+                              $regex: textFilter,
+                              $options: "i",
+                          },
+                      },
+                  }
+                : {
+                      "clientProfileData.phone": {
+                          $regex: textFilter,
+                          $options: "i",
+                      },
+                  };
         } else if (textFilter?.indexOf("-") === -1) {
-            return {
-                orderGroup: textFilter,
-            };
+            return returnType
+                ? {
+                      type: "orderGroup",
+                      filter: {
+                          orderGroup: textFilter,
+                      },
+                  }
+                : { orderGroup: textFilter };
         } else {
-            return {
-                _id: textFilter,
-            };
+            return returnType
+                ? {
+                      type: "_id",
+                      filter: {
+                          _id: textFilter,
+                      },
+                  }
+                : { _id: textFilter };
         }
     } catch (error) {
-        return {
-            _id: textFilter,
-        };
+        return returnType
+            ? {
+                  type: "_id",
+                  filter: {
+                      _id: textFilter,
+                  },
+              }
+            : { _id: textFilter };
     }
 };
 

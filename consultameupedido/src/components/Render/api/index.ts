@@ -89,13 +89,14 @@ export const create = (datasource?: string, data?: any, form: string | null = nu
     });
 };
 
-export const execFunc = (keyname?: string, data?: any): Promise<any> => {
+export const execFunc = (keyname?: string, data?: any, axiosController?: any): Promise<any> => {
     return new Promise((resolve) => {
         const url = `/api/func/${keyname}`;
         api.post(url, data, {
             headers: {
                 "Content-Type": "application/json",
             },
+            signal: axiosController,
         })
             .then((response) => {
                 resolve(response.data);
