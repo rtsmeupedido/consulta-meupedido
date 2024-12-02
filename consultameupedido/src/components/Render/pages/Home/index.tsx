@@ -7,7 +7,7 @@ import { useZaf } from "../../hooks/useZaf";
 import { useAuth } from "../../hooks/useAuth";
 import { message } from "antd";
 import Devolution from "../../components/Devolution";
-import { downloadNf, execFunc, list } from "../../api";
+import { downloadNf, execFunc, list, show } from "../../api";
 import DevolutionRequest from "../../components/DevolutionRequest";
 
 const Home = () => {
@@ -17,6 +17,7 @@ const Home = () => {
     const { logout } = useAuth();
     const [showLogout, setShowLogout] = useState(false);
     const [brands, setBrands] = useState<any>([]);
+    const [userBrands, setUserBrands] = useState<any>(null);
     const [active, setActive] = useState("order");
 
     async function onGetNf(key: string) {
@@ -65,6 +66,12 @@ const Home = () => {
     }
 
     const getBrands = async () => {
+        const _id = localStorage.getItem("@id-tck-meupedido-zendesk");
+        if (_id) {
+            await show("local_users", { _id: _id }).then(({ data }: any) => {
+                setUserBrands(data?.mp_brands);
+            });
+        }
         return await list("mp_brands")
             .then(({ data, success }: { data: any; success: boolean }) => {
                 if (!success) return;
@@ -74,7 +81,13 @@ const Home = () => {
                 console.log(error);
             });
     };
-
+    const filterBrands = brands
+        .filter((e: any) => userBrands?.includes(e.nome_vtex))
+        .map((e: any) => ({
+            name: e?.name,
+            nome_vtex: e?.nome_vtex,
+            keywords: e?.keywords,
+        }));
     useEffect(() => {
         init();
         getBrands();
@@ -98,16 +111,16 @@ const Home = () => {
             </div>
             <Divider className="my-1" />
             <div className={active === "order" ? "block" : "hidden"}>
-                <OrderTracking onGetNf={onGetNf} brands={brands} />
+                <OrderTracking onGetNf={onGetNf} userBrands={filterBrands} brands={brands} />
             </div>
             <div className={active === "product" ? "block" : "hidden"}>
-                <ProductDetails />
+                <ProductDetails userBrands={filterBrands} />
             </div>
             <div className={active === "devolution" ? "block" : "hidden"}>
-                <Devolution onGetNf={onGetNf} brands={brands} />
+                <Devolution onGetNf={onGetNf} brands={brands} userBrands={filterBrands} />
             </div>
             <div className={active === "request_devolution" ? "block" : "hidden"}>
-                <DevolutionRequest brands={brands} />
+                <DevolutionRequest brands={brands} userBrands={filterBrands} />
             </div>
             <Modal
                 centered

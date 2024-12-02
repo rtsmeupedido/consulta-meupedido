@@ -8,7 +8,7 @@ import Tab from "./tabs";
 import { parseFilter, parsePackageStatus } from "../../utils";
 import HeaderSearch from "../HeaderSearch";
 
-export default function OrderTracking({ onGetNf, brands }: { onGetNf: (str: string) => void; brands: any }) {
+export default function OrderTracking({ onGetNf, brands, userBrands }: { onGetNf: (str: string) => void; brands: any; userBrands: any }) {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(false);
     const [orderSelected, setOrderSelected] = useState<any>(null);
@@ -27,7 +27,15 @@ export default function OrderTracking({ onGetNf, brands }: { onGetNf: (str: stri
             return await list(
                 "mp_packages_last_status",
                 {
-                    before_filter: parseFilter(textFilter),
+                    before_filter: {
+                        ...parseFilter(textFilter),
+                        hostname:
+                            userBrands?.length > 0
+                                ? {
+                                      $in: (userBrands || [])?.map((e: any) => e?.nome_vtex),
+                                  }
+                                : undefined,
+                    },
                 },
                 {},
                 "query"
@@ -51,7 +59,7 @@ export default function OrderTracking({ onGetNf, brands }: { onGetNf: (str: stri
         <Style.Container>
             <Style.Style className={`w-full h-full`}>
                 <div className="flex gap-2 flex-col flex-1 overflow-hidden">
-                    <HeaderSearch placeholder="Ex: email, CPF, pacote, pedido, telefone " onChange={(text) => handleFilter(text)} loading={loading} />
+                    <HeaderSearch userBrands={userBrands} placeholder="Ex: email, CPF, pacote, pedido, telefone " onChange={(text) => handleFilter(text)} loading={loading} />
                     <div className="flex border flex-1 h-full overflow-hidden">
                         <div className="border-r w-1/2 overflow-auto">
                             {loading ? (

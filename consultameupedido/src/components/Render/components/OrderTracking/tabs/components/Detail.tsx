@@ -42,7 +42,7 @@ export default function PackageDetail({ orderSelected, onGetNf }: { orderSelecte
                     <RowItem field="Status:" value={parsePackageStatus(orderSelected?._last_status?.name)} />
                 </Row>
                 <Row>
-                    <RowItem field="Data:" value={dayjs(orderSelected?.creationDate).format("DD/MM/YYYY HH:mm")} />
+                    <RowItem field="Data:" value={orderSelected?.creationDate ? dayjs(orderSelected?.creationDate).format("DD/MM/YYYY HH:mm") : "-"} />
                     <RowItem field="Seller:" value={orderSelected?.sellers?.[0]?.name || orderSelected?.sellers?.[0]?.id} />
                 </Row>
                 <Row>
@@ -53,6 +53,11 @@ export default function PackageDetail({ orderSelected, onGetNf }: { orderSelecte
                     <RowItem field="Origem:" value={orderSelected?.__source} />
                     <RowItem field="Rastreio:" value={orderSelected?.tracking_code} />
                 </Row>
+                {orderSelected?.data_entrega_prevista && (
+                    <Row>
+                        <RowItem field="Previsão de entrega:" value={orderSelected?.data_entrega_prevista ? dayjs(orderSelected?.data_entrega_prevista).format("DD/MM/YYYY HH:mm") : "-"} />
+                    </Row>
+                )}
             </Info>
             <Divider className="my-6" />
             <Info title="Itens">

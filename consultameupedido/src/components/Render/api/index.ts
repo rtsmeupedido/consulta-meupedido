@@ -131,6 +131,7 @@ export const checkAuth = (token: string) => {
             },
         })
             .then((response) => {
+                console.log("🚀 ~ response:", response);
                 if (response?.data?._id) {
                     resolve(true);
                 } else {
