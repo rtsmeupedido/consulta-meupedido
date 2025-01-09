@@ -1,6 +1,7 @@
 import { Tabs } from "rtk-ux";
 import LiveEvents from "./components/LiveEvents";
 import PackageDetail from "./components/Detail";
+import Treatment from "./components/Treatment";
 export default function Tab({ order, onGetNf }: { order: any; onGetNf: (str: string) => void }) {
     return (
         <Tabs
@@ -32,6 +33,20 @@ export default function Tab({ order, onGetNf }: { order: any; onGetNf: (str: str
                             }}
                         >
                             <LiveEvents order={order} />
+                        </div>
+                    ),
+                },
+                {
+                    label: <div className="text-xs">Tratativa Atendimento</div>,
+                    key: "treatment",
+                    children: (
+                        <div
+                            className="overflow-auto"
+                            style={{
+                                height: "calc(100vh - 200px)",
+                            }}
+                        >
+                            <Treatment order={order} />
                         </div>
                     ),
                 },
