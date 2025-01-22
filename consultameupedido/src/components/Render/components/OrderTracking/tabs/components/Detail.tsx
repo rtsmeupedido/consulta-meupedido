@@ -1,4 +1,4 @@
-import { Button, Divider, MuiIcon, Tooltip } from "rtk-ux";
+import { Divider, MuiIcon, Tag, Tooltip } from "rtk-ux";
 import dayjs from "dayjs";
 import { parsePackageStatus } from "../../../../utils";
 
@@ -22,7 +22,6 @@ export default function PackageDetail({ orderSelected, onGetNf }: { orderSelecte
     };
     const payments = orderSelected?.paymentData?.transactions?.[0]?.payments || [];
     const giftCards = (orderSelected?.paymentData?.giftCards || [])?.filter((g: any) => g?.inUse);
-
     return (
         <div className="flex flex-col pb-3 text-xs">
             <Info title="Cliente">
@@ -61,9 +60,11 @@ export default function PackageDetail({ orderSelected, onGetNf }: { orderSelecte
             </Info>
             <Divider className="my-6" />
             <Info title="Itens">
-                {orderSelected?.items?.map((i: any, idx: number) => (
-                    <Item idx={idx} data={i} key={i?.uniqueId} />
-                ))}
+                {orderSelected?.items?.map((i: any, idx: number) => {
+                    const listChangedItems = orderSelected?.changesAttachment?.changesData?.[0]?.itemsRemoved;
+                    const isRemoved = listChangedItems?.find((p: any) => p?.id === i?.id) || false;
+                    return <Item idx={idx} data={i} key={i?.uniqueId} isRemoved={isRemoved} />;
+                })}
             </Info>
             <Divider className="my-6" />
             <Info title="Pagamento">
@@ -187,11 +188,11 @@ const RowItem = ({ field = "", value = "", copy = false, url = null, nf = false,
         </div>
     );
 };
-const Item = ({ data, idx }: any) => {
+const Item = ({ data, isRemoved }: any) => {
     return (
-        <div className="flex item-center group/item relative">
+        <div className={"flex item-center group/item relative"}>
             <img style={{ height: 45, width: 30 }} className="object-contain rounded-sm" src={data?.imageUrl} />
-            <div className="flex justify-center flex-col flex-1 px-2">
+            <div className={`flex justify-center flex-col flex-1 px-2 relative ${isRemoved ? "opacity-40" : ""}`}>
                 <span className="text-black font-semibold line-clamp-1">{data?.name}</span>
                 <div className="flex items-center justify-between mt-1">
                     <div className="flex items-center gap-0.5">
@@ -202,27 +203,24 @@ const Item = ({ data, idx }: any) => {
                         <span>Ref:</span>
                         <div className="text-blue-950 font-semibold flex items-center gap-1">
                             {data?.refId}
-                            {/* <Icon click onClick={() => navigator.clipboard.writeText(data?.refId)} icon={["far", "clipboard"]} className="text-gray-500 hover:text-blue-600" /> */}
+                            <Tooltip title="Copiar">
+                                <MuiIcon fontSize="small" click onClick={() => navigator.clipboard.writeText(data?.refId)} icon={["mui", "copy_all"]} className="text-gray-500 hover:text-blue-600" />
+                            </Tooltip>
                         </div>
                     </div>
-                    <div className="flex items-center gap-0.5">
+                    <div className={`flex items-center gap-0.5 ${isRemoved ? "opacity-0" : ""}`}>
                         <span>Tam:</span>
                         <div className="text-blue-950 font-semibold">-</div>
                     </div>
-                    <div className="flex items-center gap-0.5">
+                    <div className={`flex items-center gap-0.5 ${isRemoved ? "opacity-0" : ""}`}>
                         <span>Qtd:</span>
                         <div className="text-blue-950 font-semibold">{data?.quantity || 0}</div>
                     </div>
                 </div>
             </div>
-            {idx > 0 && (
-                <div className="bg-black/10 hidden items-center gap-3 rounded-lg justify-center absolute w-full h-full group-hover/item:flex">
-                    <Button size="small" type="primary">
-                        Trocar
-                    </Button>
-                    <Button size="small" type="primary">
-                        Devolver
-                    </Button>
+            {isRemoved && (
+                <div className="absolute right-4 top-2">
+                    <Tag color="red">Removido</Tag>
                 </div>
             )}
         </div>
