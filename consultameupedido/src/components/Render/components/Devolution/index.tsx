@@ -6,7 +6,7 @@ import { execFunc } from "../../api";
 import dayjs from "dayjs";
 import HeaderSearch from "../HeaderSearch";
 import DevolutionTable from "../DevolutionTable";
-import { parseFilter } from "../../utils";
+import { parseFilter, saveLog } from "../../utils";
 
 export default function Devolution({ onGetNf, brands, userBrands }: { onGetNf: (str: string) => void; brands: any[]; userBrands: any }) {
     const div_ref = useRef<any>(null);
@@ -40,7 +40,9 @@ export default function Devolution({ onGetNf, brands, userBrands }: { onGetNf: (
         if (filter?.type === "document") {
             setBigLoad(true);
         }
-        await execFunc("consulta_devolucao_wms_zd", { filter: filter?.filter, type: filter?.type, text, userBrands }, controller.signal)
+        const filterFunc = { filter: filter?.filter, type: filter?.type, text, userBrands };
+        await saveLog({ actionCallType: "function", actionCallName: "consulta_devolucao_wms_zd", actionDescription: `Consulta devolução bipada: ${text}`, actionCallDataSent: filterFunc });
+        await execFunc("consulta_devolucao_wms_zd", filterFunc, controller.signal)
             .then(({ data }) => {
                 if (data?.type === "document") {
                     setList(data?.items || []);

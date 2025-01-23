@@ -219,7 +219,7 @@ const Item = ({ data, isRemoved }: any) => {
                 </div>
             </div>
             {isRemoved && (
-                <div className="absolute right-4 top-2">
+                <div className="absolute right-0 top-2">
                     <Tag color="red">Removido</Tag>
                 </div>
             )}

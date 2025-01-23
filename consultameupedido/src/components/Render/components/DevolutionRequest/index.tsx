@@ -5,7 +5,7 @@ import { Col, Image, Loader, Row } from "rtk-ux";
 import { execFunc } from "../../api";
 import HeaderSearch from "../HeaderSearch";
 import dayjs from "dayjs";
-import { parseFilter } from "../../utils";
+import { parseFilter, saveLog } from "../../utils";
 import DevolutionTable from "../DevolutionTable";
 
 export default function DevolutionRequest({ brands, userBrands }: { brands: any; userBrands: any }) {
@@ -32,7 +32,9 @@ export default function DevolutionRequest({ brands, userBrands }: { brands: any;
         setInfo(null);
         setError("");
         const filter = parseFilter(text, true);
-        await execFunc("zd_consulta_troquecommerce", { filter: filter?.filter, type: filter?.type, userBrands }, controller.signal)
+        const sendFilter = { filter: filter?.filter, type: filter?.type, userBrands };
+        await saveLog({ actionCallType: "delete", actionCallName: "tratativas_atendimento", actionDescription: `Consultou TroquEcommerce: ${filter?.filter}`, actionCallDataSent: sendFilter });
+        await execFunc("zd_consulta_troquecommerce", sendFilter, controller.signal)
             .then(({ data }) => {
                 setCode(text);
                 if (data.returnValues) {

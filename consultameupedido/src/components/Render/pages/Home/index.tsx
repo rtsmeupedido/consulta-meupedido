@@ -16,6 +16,7 @@ const Home = () => {
     const zafClient = useZaf();
     const { logout } = useAuth();
     const [showLogout, setShowLogout] = useState(false);
+    const [versionApp, setVersionApp] = useState(null);
     const [brands, setBrands] = useState<any>([]);
     const [userBrands, setUserBrands] = useState<any>(null);
     const [active, setActive] = useState("order");
@@ -63,8 +64,14 @@ const Home = () => {
         //@ts-ignore
         const t: any = await zafClient.zafClient?.get("viewport.size");
         zafClient.zafClient?.invoke("resize", { width: (t?.["viewport.size"].width || 1000) * 0.85, height: (t?.["viewport.size"].height || 600) - 150 });
+        zafClient.zafClient?.metadata().then(function (metadata) {
+            //@ts-ignore
+            if (metadata?.version) {
+                //@ts-ignore
+                setVersionApp(metadata?.version);
+            }
+        });
     }
-
     const getBrands = async () => {
         const _id = localStorage.getItem("@id-tck-meupedido-zendesk");
         if (_id) {
@@ -81,6 +88,7 @@ const Home = () => {
                 console.log(error);
             });
     };
+
     const filterBrands = brands
         .filter((e: any) => userBrands?.includes(e.nome_vtex))
         .map((e: any) => ({
@@ -140,6 +148,7 @@ const Home = () => {
                     Tem certeza que deseja realizar logoff?
                 </div>
             </Modal>
+            {versionApp ? <div className="fixed bottom-0.5 text-gray-300 left-1 text-[10px]">{`${versionApp}`}</div> : ""}
         </div>
     );
 };

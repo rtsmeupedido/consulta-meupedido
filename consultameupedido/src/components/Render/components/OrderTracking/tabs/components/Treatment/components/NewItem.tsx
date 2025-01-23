@@ -29,9 +29,9 @@ export default function NewItem({ onSave, onCancel, values, readOnly, options }:
     };
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="w-full flex flex-col gap-3">
-                <div className="flex flex-col gap-3">
+        <form onSubmit={handleSubmit(onSubmit)} className="h-[70vh]">
+            <div className="w-full h-full flex flex-col justify-between flex-1">
+                <div className="flex flex-col gap-3 overflow-auto px-6">
                     <div className="flex flex-col flex-1 gap-1">
                         <span className="text-xs">Incidente</span>
                         <Controller
@@ -40,6 +40,7 @@ export default function NewItem({ onSave, onCancel, values, readOnly, options }:
                             render={({ field }) => (
                                 <Cascader
                                     disabled={readOnly}
+                                    showSearch
                                     displayRender={(e) => <div className="text-xs">{e.join(" - ")}</div>}
                                     className="w-full"
                                     value={field?.value}
@@ -59,7 +60,11 @@ export default function NewItem({ onSave, onCancel, values, readOnly, options }:
                         <>
                             <div className="flex flex-col flex-1 gap-1">
                                 <span className="text-xs">Número do ticket</span>
-                                <Controller name="numero_ticket" control={control} render={({ field }) => <Input readOnly={readOnly} className="text-xs h-8" value={field.value} onChange={(e) => setValue(field.name, e.target.value)} />} />
+                                <Controller
+                                    name="numero_ticket"
+                                    control={control}
+                                    render={({ field }) => <Input readOnly={readOnly} type="number" addonBefore="#" className="text-xs h-8" value={field.value} onChange={(e) => setValue(field.name, e.target.value)} />}
+                                />
                             </div>
                             {incidente?.[0] === "qualidade" && (
                                 <div className="flex flex-col flex-1 gap-1">
@@ -98,25 +103,19 @@ export default function NewItem({ onSave, onCancel, values, readOnly, options }:
                                                 <Col key={item?.value} span={item?.type === "textarea" ? 24 : 12}>
                                                     <div className="flex flex-col flex-1 gap-1">
                                                         <span className="text-xs">{item?.label}</span>
-                                                        {item?.type === "textarea" ? (
-                                                            <Controller
-                                                                name={item.value}
-                                                                control={control}
-                                                                render={({ field }) => <Input.TextArea className="text-xs" readOnly={readOnly} value={field.value} rows={5} onChange={(e) => setValue(field.name, e.target.value)} />}
-                                                            />
-                                                        ) : item?.type === "number" ? (
-                                                            <Controller
-                                                                name={item.value}
-                                                                control={control}
-                                                                render={({ field }) => <InputNumber readOnly={readOnly} className="w-full text-xs h-8 flex items-center" value={field.value} onChange={(num) => setValue(field.name, num)} />}
-                                                            />
-                                                        ) : (
-                                                            <Controller
-                                                                name={item.value}
-                                                                control={control}
-                                                                render={({ field }) => <Input readOnly={readOnly} className="text-xs h-8" value={field.value} onChange={(e) => setValue(field.name, e.target.value)} />}
-                                                            />
-                                                        )}
+                                                        <Controller
+                                                            name={item.value}
+                                                            control={control}
+                                                            render={({ field }) =>
+                                                                item?.type === "textarea" ? (
+                                                                    <Input.TextArea className="text-xs" readOnly={readOnly} value={field.value} rows={5} onChange={(e) => setValue(field.name, e.target.value)} />
+                                                                ) : item?.type === "number" ? (
+                                                                    <InputNumber readOnly={readOnly} className="w-full text-xs h-8 flex items-center" value={field.value} onChange={(num) => setValue(field.name, num)} />
+                                                                ) : (
+                                                                    <Input readOnly={readOnly} className="text-xs h-8" value={field.value} onChange={(e) => setValue(field.name, e.target.value)} />
+                                                                )
+                                                            }
+                                                        />
                                                     </div>
                                                 </Col>
                                             );
@@ -126,7 +125,7 @@ export default function NewItem({ onSave, onCancel, values, readOnly, options }:
                         </>
                     )}
                 </div>
-                <div className="flex items-center justify-end gap-2">
+                <div className="flex items-center justify-end gap-2 px-4 py-4">
                     <Button onClick={() => onCancel()}>cancelar</Button>
                     {!readOnly && (
                         <Button disabled={!incidente} loading={loadingSend} type="primary" htmlType="submit">
@@ -138,3 +137,13 @@ export default function NewItem({ onSave, onCancel, values, readOnly, options }:
         </form>
     );
 }
+
+// ) : item?.type === "date" ? (
+//     <DatePicker
+//         readOnly={readOnly}
+//         placeholder="Selecione a data"
+//         format={"DD/MM/YYYY"}
+//         className="w-full text-xs h-8 flex items-center"
+//         value={field.value ? dayjs(field.value) : undefined}
+//         onChange={(d) => setValue(field.name, d.format())}
+//     />

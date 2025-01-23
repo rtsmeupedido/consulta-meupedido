@@ -14,7 +14,13 @@ export default function HeaderSearch({ onChange, onCancel, loading, placeholder,
     return (
         <div className="flex items-center gap-1">
             <Input className="w-80 h-8" placeholder={placeholder} onPressEnter={() => onChange(text.trim())} value={text} onChange={(e: any) => setText(e.target.value)} />
-            <Button onClick={() => onChange(text.trim())} loading={loading} disabled={!text.length}>
+            <Button
+                onClick={() => {
+                    onChange(text.trim());
+                }}
+                loading={loading}
+                disabled={!text.length}
+            >
                 <MuiIcon icon={["mui", "search"]} color="black" />
             </Button>
             {onCancel && loading && <Button onClick={() => onCancel && onCancel()}>cancelar</Button>}

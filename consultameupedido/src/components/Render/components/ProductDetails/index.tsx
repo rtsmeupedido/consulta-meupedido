@@ -4,6 +4,7 @@ import * as Style from "./styles";
 import { Table, Divider, Loader } from "rtk-ux";
 import { execFunc } from "../../api";
 import HeaderSearch from "../HeaderSearch";
+import { saveLog } from "../../utils";
 export default function ProductDetails({ userBrands }: any) {
     const div_ref = useRef<any>(null);
     const [loading, setLoading] = useState(false);
@@ -18,7 +19,10 @@ export default function ProductDetails({ userBrands }: any) {
         setSignal(controller);
         seterrorMsg("Nenhum produto selecionado.");
         setLoading(true);
-        await execFunc("conexao_sql_bdviews_zd", { text, userBrands }, controller.signal)
+        const filter = { text, userBrands };
+        await saveLog({ actionCallType: "function", actionCallName: "conexao_sql_bdviews_zd", actionDescription: `Consulta produto pela referência: ${text}`, actionCallDataSent: filter });
+
+        await execFunc("conexao_sql_bdviews_zd", filter, controller.signal)
             .then(({ data }) => {
                 if (!data?.info?.package?.[0]) {
                     seterrorMsg("Nenhum produto encontrado.");

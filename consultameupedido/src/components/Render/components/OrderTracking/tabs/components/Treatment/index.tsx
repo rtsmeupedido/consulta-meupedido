@@ -5,6 +5,7 @@ import { create, execFunc, list, remove, update } from "../../../../../api";
 import ListGrid from "./components/ListGrid";
 import arrayToTree from "array-to-tree";
 import { options as defOptions } from "./util";
+import { saveLog } from "../../../../../utils";
 
 type Props = {
     order: any;
@@ -19,46 +20,57 @@ export default function Treatment({ order }: Props) {
     const [data, setData] = useState([]);
     const [selected, setSelected] = useState<any>(null);
 
+    async function getPermissionsAndItems() {
+        try {
+            await execFunc("check_user_permissions_zd").then(({ data }) => {
+                setPermissions(data);
+            });
+            await list("classificacoes_tratativas", {}, undefined, "query", { __created: 1 }).then(({ data }) => {
+                const formatData = data.map((e: any) => ({ ...e, label: e?.name, value: e?._id }));
+                const _res = arrayToTree(formatData, {
+                    parentProperty: "parent",
+                    customID: "_id",
+                    rootID: "_id",
+                });
+                if (_res) {
+                    setOptions(_res);
+                } else {
+                    setOptions(defOptions);
+                }
+            });
+        } catch (err) {
+            return err;
+        }
+    }
     async function init() {
         setLoading(true);
-        await execFunc("check_user_permissions_zd").then(({ data }) => setPermissions(data));
-        await list("classificacoes_tratativas", {}, undefined, "query", { __created: 1 }).then(({ data }) => {
-            const formatData = data.map((e: any) => ({ ...e, label: e?.name, value: e?._id }));
-            const _res = arrayToTree(formatData, {
-                parentProperty: "parent",
-                customID: "_id",
-                rootID: "_id",
-            });
-            if (_res) {
-                setOptions(_res);
-            } else {
-                setOptions(defOptions);
-            }
-        });
         await list("tratativas_atendimento", { filter: { orderId: order?.orderId } }, undefined, "query", { __created: 1 }).then(({ data }) => {
             setData(data);
         });
         setLoading(false);
     }
+
     async function onCreate(data: any) {
         setLoading(true);
         if (data._id) {
+            await saveLog({ actionCallType: "update", actionCallName: "tratativas_atendimento", actionDescription: `Atualizou uma incidência: ${data?._id}`, actionCallDataSent: data });
             await update("tratativas_atendimento", data);
         } else {
+            await saveLog({ actionCallType: "create", actionCallName: "tratativas_atendimento", actionDescription: `Criou uma nova incidência: ${order?.orderId}`, actionCallDataSent: data });
             await create("tratativas_atendimento", {
                 ...data,
                 orderId: order?.orderId,
                 name: `${order?.orderId} - ${data?.numero_ticket}`,
             });
         }
-        init();
         setIsOpenNew(false);
         setSelected(null);
-        setLoading(false);
+        await init();
     }
     async function onDelete(data: any) {
         if (!data?._id) return;
         setLoading(true);
+        await saveLog({ actionCallType: "delete", actionCallName: "tratativas_atendimento", actionDescription: `Apagou uma incidência: ${data?._id}`, actionCallDataSent: data });
         await remove("tratativas_atendimento", data?._id)
             .then(({ success }) => {
                 if (!success) return;
@@ -78,14 +90,18 @@ export default function Treatment({ order }: Props) {
     }
 
     useEffect(() => {
-        init();
+        const initPage = async () => {
+            await getPermissionsAndItems();
+            await init();
+        };
+        initPage();
         return () => {};
     }, []);
 
     return (
         <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
-                <strong className="text-base font-semibold">Incidentes</strong>
+                <strong className="text-base font-semibold">Incidências ({data?.length})</strong>
                 {permissions?.tratativas?.create && (
                     <Button
                         onClick={() => {
@@ -95,7 +111,7 @@ export default function Treatment({ order }: Props) {
                         type="primary"
                         className="w-min"
                     >
-                        Criar novo
+                        Criar nova
                     </Button>
                 )}
             </div>
@@ -111,6 +127,10 @@ export default function Treatment({ order }: Props) {
                     setIsOpenNew(false);
                     setSelected(null);
                     setIsReadOnly(false);
+                }}
+                classNames={{
+                    content: "p-0",
+                    header: "px-6 pt-4 pb-2",
                 }}
             >
                 <NewItem
