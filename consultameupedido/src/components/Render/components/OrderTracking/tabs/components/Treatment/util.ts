@@ -100,7 +100,7 @@ export const optionsSAC = [
             {
                 value: "numero_pedido_gerado",
                 label: "Número do pedido gerado",
-                type: "number",
+                required: true,
             },
         ],
     },

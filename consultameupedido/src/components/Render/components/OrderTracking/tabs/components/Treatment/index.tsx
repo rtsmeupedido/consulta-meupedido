@@ -43,6 +43,7 @@ export default function Treatment({ order }: Props) {
         }
     }
     async function init() {
+        if (!order?.orderId) return;
         setLoading(true);
         await list("tratativas_atendimento", { filter: { orderId: order?.orderId } }, undefined, "query", { __created: 1 }).then(({ data }) => {
             setData(data);
@@ -96,7 +97,7 @@ export default function Treatment({ order }: Props) {
         };
         initPage();
         return () => {};
-    }, []);
+    }, [order?.orderId]);
 
     return (
         <div className="flex flex-col gap-2">

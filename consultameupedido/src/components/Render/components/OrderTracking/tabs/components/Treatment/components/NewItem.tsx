@@ -13,7 +13,13 @@ type Props = {
 
 export default function NewItem({ onSave, onCancel, values, readOnly, options }: Props) {
     const [loadingSend, setLoadingSend] = useState(false);
-    const { control, handleSubmit, setValue, watch } = useForm<any>({
+    const {
+        control,
+        handleSubmit,
+        setValue,
+        watch,
+        formState: { errors },
+    } = useForm<any>({
         defaultValues: values,
     });
     const incidente = watch("incidente");
@@ -61,10 +67,22 @@ export default function NewItem({ onSave, onCancel, values, readOnly, options }:
                             <div className="flex flex-col flex-1 gap-1">
                                 <span className="text-xs">Número do ticket</span>
                                 <Controller
+                                    rules={{ required: true }}
                                     name="numero_ticket"
                                     control={control}
-                                    render={({ field }) => <Input readOnly={readOnly} type="number" addonBefore="#" className="text-xs h-8" value={field.value} onChange={(e) => setValue(field.name, e.target.value)} />}
+                                    render={({ field }) => (
+                                        <Input
+                                            status={errors?.numero_ticket ? "error" : undefined}
+                                            readOnly={readOnly}
+                                            type="number"
+                                            addonBefore="#"
+                                            className="text-xs h-8"
+                                            value={field.value}
+                                            onChange={(e) => setValue(field.name, e.target.value)}
+                                        />
+                                    )}
                                 />
+                                {errors?.numero_ticket && <span className="text-red-500 text-xs">Campo obrigatório</span>}
                             </div>
                             {incidente?.[0] === "qualidade" && (
                                 <div className="flex flex-col flex-1 gap-1">
@@ -99,23 +117,39 @@ export default function NewItem({ onSave, onCancel, values, readOnly, options }:
                                     {optionsSAC
                                         ?.find((e) => e.value === tratativa)
                                         ?.fields?.map((item) => {
+                                            const isError = errors?.[item.value];
                                             return (
                                                 <Col key={item?.value} span={item?.type === "textarea" ? 24 : 12}>
                                                     <div className="flex flex-col flex-1 gap-1">
                                                         <span className="text-xs">{item?.label}</span>
                                                         <Controller
+                                                            rules={{ required: item?.required }}
                                                             name={item.value}
                                                             control={control}
                                                             render={({ field }) =>
                                                                 item?.type === "textarea" ? (
-                                                                    <Input.TextArea className="text-xs" readOnly={readOnly} value={field.value} rows={5} onChange={(e) => setValue(field.name, e.target.value)} />
+                                                                    <Input.TextArea
+                                                                        status={isError ? "error" : undefined}
+                                                                        className="text-xs"
+                                                                        readOnly={readOnly}
+                                                                        value={field.value}
+                                                                        rows={5}
+                                                                        onChange={(e) => setValue(field.name, e.target.value)}
+                                                                    />
                                                                 ) : item?.type === "number" ? (
-                                                                    <InputNumber readOnly={readOnly} className="w-full text-xs h-8 flex items-center" value={field.value} onChange={(num) => setValue(field.name, num)} />
+                                                                    <InputNumber
+                                                                        status={isError ? "error" : undefined}
+                                                                        readOnly={readOnly}
+                                                                        className="w-full text-xs h-8 flex items-center"
+                                                                        value={field.value}
+                                                                        onChange={(num) => setValue(field.name, num)}
+                                                                    />
                                                                 ) : (
-                                                                    <Input readOnly={readOnly} className="text-xs h-8" value={field.value} onChange={(e) => setValue(field.name, e.target.value)} />
+                                                                    <Input status={isError ? "error" : undefined} readOnly={readOnly} className="text-xs h-8" value={field.value} onChange={(e) => setValue(field.name, e.target.value)} />
                                                                 )
                                                             }
                                                         />
+                                                        {isError && <span className="text-red-500 text-xs">Campo obrigatório</span>}
                                                     </div>
                                                 </Col>
                                             );
