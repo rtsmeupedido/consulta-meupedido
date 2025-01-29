@@ -35,7 +35,7 @@ export default function OrderTracking({ onGetNf, brands, userBrands }: { onGetNf
                             : undefined,
                 },
             };
-            await saveLog({ actionCallType: "query", actionCallName: "mp_packages_last_status", actionDescription: `Consulta pacote: ${textFilter}`, actionCallDataSent: filter });
+            saveLog({ actionCallType: "query", actionCallName: "mp_packages_last_status", actionDescription: `Consulta pacote: ${textFilter}`, actionCallDataSent: filter });
 
             return await list("mp_packages_last_status", filter, {}, "query")
                 .then(({ data }: any) => {

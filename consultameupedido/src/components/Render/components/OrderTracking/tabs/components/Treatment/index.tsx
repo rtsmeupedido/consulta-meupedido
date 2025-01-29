@@ -54,10 +54,10 @@ export default function Treatment({ order }: Props) {
     async function onCreate(data: any) {
         setLoading(true);
         if (data._id) {
-            await saveLog({ actionCallType: "update", actionCallName: "tratativas_atendimento", actionDescription: `Atualizou uma incidência: ${data?._id}`, actionCallDataSent: data });
+            saveLog({ actionCallType: "update", actionCallName: "tratativas_atendimento", actionDescription: `Atualizou uma incidência: ${data?._id}`, actionCallDataSent: data });
             await update("tratativas_atendimento", data);
         } else {
-            await saveLog({ actionCallType: "create", actionCallName: "tratativas_atendimento", actionDescription: `Criou uma nova incidência: ${order?.orderId}`, actionCallDataSent: data });
+            saveLog({ actionCallType: "create", actionCallName: "tratativas_atendimento", actionDescription: `Criou uma nova incidência: ${order?.orderId}`, actionCallDataSent: data });
             await create("tratativas_atendimento", {
                 ...data,
                 orderId: order?.orderId,
@@ -71,7 +71,7 @@ export default function Treatment({ order }: Props) {
     async function onDelete(data: any) {
         if (!data?._id) return;
         setLoading(true);
-        await saveLog({ actionCallType: "delete", actionCallName: "tratativas_atendimento", actionDescription: `Apagou uma incidência: ${data?._id}`, actionCallDataSent: data });
+        saveLog({ actionCallType: "delete", actionCallName: "tratativas_atendimento", actionDescription: `Apagou uma incidência: ${data?._id}`, actionCallDataSent: data });
         await remove("tratativas_atendimento", data?._id)
             .then(({ success }) => {
                 if (!success) return;

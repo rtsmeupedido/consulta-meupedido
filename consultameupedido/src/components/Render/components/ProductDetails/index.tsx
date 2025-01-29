@@ -20,7 +20,7 @@ export default function ProductDetails({ userBrands }: any) {
         seterrorMsg("Nenhum produto selecionado.");
         setLoading(true);
         const filter = { text, userBrands };
-        await saveLog({ actionCallType: "function", actionCallName: "conexao_sql_bdviews_zd", actionDescription: `Consulta produto pela referência: ${text}`, actionCallDataSent: filter });
+        saveLog({ actionCallType: "function", actionCallName: "conexao_sql_bdviews_zd", actionDescription: `Consulta produto pela referência: ${text}`, actionCallDataSent: filter });
 
         await execFunc("conexao_sql_bdviews_zd", filter, controller.signal)
             .then(({ data }) => {

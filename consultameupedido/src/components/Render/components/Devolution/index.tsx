@@ -41,7 +41,7 @@ export default function Devolution({ onGetNf, brands, userBrands }: { onGetNf: (
             setBigLoad(true);
         }
         const filterFunc = { filter: filter?.filter, type: filter?.type, text, userBrands };
-        await saveLog({ actionCallType: "function", actionCallName: "consulta_devolucao_wms_zd", actionDescription: `Consulta devolução bipada: ${text}`, actionCallDataSent: filterFunc });
+        saveLog({ actionCallType: "function", actionCallName: "consulta_devolucao_wms_zd", actionDescription: `Consulta devolução bipada: ${text}`, actionCallDataSent: filterFunc });
         await execFunc("consulta_devolucao_wms_zd", filterFunc, controller.signal)
             .then(({ data }) => {
                 if (data?.type === "document") {

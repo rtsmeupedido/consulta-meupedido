@@ -33,7 +33,7 @@ export default function DevolutionRequest({ brands, userBrands }: { brands: any;
         setError("");
         const filter = parseFilter(text, true);
         const sendFilter = { filter: filter?.filter, type: filter?.type, userBrands };
-        await saveLog({ actionCallType: "delete", actionCallName: "tratativas_atendimento", actionDescription: `Consultou TroquEcommerce: ${filter?.filter}`, actionCallDataSent: sendFilter });
+        saveLog({ actionCallType: "function", actionCallName: "zd_consulta_troquecommerce", actionDescription: `Consultou TroquEcommerce: ${text}`, actionCallDataSent: sendFilter });
         await execFunc("zd_consulta_troquecommerce", sendFilter, controller.signal)
             .then(({ data }) => {
                 setCode(text);
@@ -240,7 +240,7 @@ export default function DevolutionRequest({ brands, userBrands }: { brands: any;
                                                             Validade:
                                                         </Col>
                                                         <Col span={10} className="text-black font-semibold">
-                                                            {info?.reverse_coupon.validity ? dayjs(info?.reverse_coupon.validity).format("DD/MM/YYYY") : "-"}
+                                                            {info?.reverse_coupon?.validity ? dayjs(info?.reverse_coupon?.validity).format("DD/MM/YYYY") : "-"}
                                                         </Col>
                                                         <Col span={4} className="text-gray-400">
                                                             Valor:
@@ -289,7 +289,7 @@ export default function DevolutionRequest({ brands, userBrands }: { brands: any;
                                                             Data:
                                                         </Col>
                                                         <Col span={8} className="text-black font-semibold">
-                                                            {info?.reverse_payment?.created_at ? dayjs(info.reverse_payment.created_at).format("DD/MM/YYYY") : "-"}
+                                                            {info?.reverse_payment?.created_at ? dayjs(info?.reverse_payment?.created_at).format("DD/MM/YYYY") : "-"}
                                                         </Col>
                                                     </Row>
                                                 </Col>
