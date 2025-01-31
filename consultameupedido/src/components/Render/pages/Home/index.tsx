@@ -100,7 +100,7 @@ const Home = () => {
         init();
         getBrands();
     }, []);
-
+    const userName = localStorage.getItem("@name-tck-meupedido-zendesk");
     return (
         <div className="flex flex-col gap-3 p-4">
             {contextHolder}
@@ -113,9 +113,12 @@ const Home = () => {
                         </Button>
                     ))}
                 </div>
-                <Button icon={<MuiIcon icon={["mui", "logout"]} color="white" />} className="bg-gray-400 hover:bg-gray-500 text-white" type="text" onClick={() => setShowLogout(true)}>
-                    Fazer logoff
-                </Button>
+                <div className="flex items-center gap-2">
+                    {userName && <div className="text-xs">Usuário: {userName}</div>}
+                    <Button icon={<MuiIcon icon={["mui", "logout"]} color="white" />} className="bg-gray-400 hover:bg-gray-500 text-white" type="text" onClick={() => setShowLogout(true)}>
+                        Fazer logoff
+                    </Button>
+                </div>
             </div>
             <Divider className="my-1" />
             <div className={active === "order" ? "block" : "hidden"}>

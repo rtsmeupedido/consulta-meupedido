@@ -50,7 +50,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         password = CryptoJS.AES.encrypt(password, hashPassword).toString();
         const data = JSON.stringify({ email, password });
         const config = {
-            url: "https://api.oauth.runtask.com/api/func/get_url_by_zd",
+            url: "https://api.oauth.runtask.com/api/func/get_url_by_zd?is_server=false",
             type: "POST",
             contentType: "application/json",
             headers: {

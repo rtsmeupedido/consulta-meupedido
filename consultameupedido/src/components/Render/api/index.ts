@@ -107,7 +107,7 @@ export const create = (datasource?: string, data?: any, form: string | null = nu
 
 export const execFunc = (keyname?: string, data?: any, axiosController?: any): Promise<any> => {
     return new Promise((resolve) => {
-        const url = `/api/func/${keyname}`;
+        const url = `/api/func/${keyname}?is_server=false`;
         api.post(url, data, {
             headers: {
                 "Content-Type": "application/json",

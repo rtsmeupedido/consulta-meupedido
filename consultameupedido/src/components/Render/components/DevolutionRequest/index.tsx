@@ -138,13 +138,13 @@ export default function DevolutionRequest({ brands, userBrands }: { brands: any;
                                                     <Col span={8} className="text-black font-semibold">
                                                         {info?.tracking?.courier_collect_number}
                                                     </Col>
-                                                    {/* <Col span={5} className="text-gray-400">
-                                                        Prazo para postagem:
+                                                    <Col span={5} className="text-gray-400">
+                                                        Validadade do código de postagem:
                                                     </Col>
                                                     <Col span={7} className="text-black font-semibold">
-                                                        {"-"}
-                                                    </Col> */}
-                                                    <Col span={12} />
+                                                        {info?.tracking?.due_date ? dayjs(info?.tracking?.due_date).format("DD/MM/YYYY") : "-"}
+                                                    </Col>
+                                                    {/* <Col span={12} /> */}
                                                     <Col span={4} className="text-gray-400">
                                                         Rastreio:
                                                     </Col>
