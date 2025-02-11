@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import { Button, Col, Dropdown, Loader, MuiIcon, Row } from "rtk-ux";
 import { optionsSAC } from "../util";
+import { formatJsonField } from "../../../../../../utils";
 
 type Props = {
     data: any[];
@@ -9,9 +10,10 @@ type Props = {
     onDelete: any;
     onEdit: any;
     options: any[];
+    optionsFlat: any[];
 };
 
-export default function ListGrid({ data, loading, permissions, onDelete, onEdit, options }: Props) {
+export default function ListGrid({ data, loading, permissions, onDelete, onEdit, options, optionsFlat }: Props) {
     return (
         <div className="flex flex-col divide-y">
             {loading ? (
@@ -19,7 +21,7 @@ export default function ListGrid({ data, loading, permissions, onDelete, onEdit,
                     <Loader />
                 </div>
             ) : data?.length > 0 ? (
-                data?.map((item, i) => <ListItem options={options} index={i} key={item._id} item={item} permissions={permissions} onEdit={onEdit} onView={onEdit} onDelete={onDelete} />)
+                data?.map((item, i) => <ListItem options={options} optionsFlat={optionsFlat} index={i} key={item._id} item={item} permissions={permissions} onEdit={onEdit} onView={onEdit} onDelete={onDelete} />)
             ) : (
                 <div className="text-center p-8">Nenhuma incidência encontrada</div>
             )}
@@ -27,7 +29,7 @@ export default function ListGrid({ data, loading, permissions, onDelete, onEdit,
     );
 }
 
-const ListItem = ({ item, index, permissions, onEdit, onView, onDelete, options }: any) => {
+const ListItem = ({ item, index, permissions, onEdit, onView, onDelete, options, optionsFlat }: any) => {
     const tratativaSAC = optionsSAC?.find((e) => e?.value === item?.sac);
     const inc1 = options?.find((e: any) => e?.value === item?.incidente?.[0]);
     const inc2 = inc1 && item?.incidente?.[1] && inc1?.children?.find((e: any) => e?.value === item?.incidente?.[1]);
@@ -48,7 +50,6 @@ const ListItem = ({ item, index, permissions, onEdit, onView, onDelete, options 
                 break;
         }
     }
-
     const actions = [
         {
             label: "Visualizar",
@@ -69,6 +70,8 @@ const ListItem = ({ item, index, permissions, onEdit, onView, onDelete, options 
             key: "delete",
         },
     ].filter((e) => e.enable);
+
+    const incidenteModel = optionsFlat?.find((e: any) => e?._id === item?.incidente_id);
 
     return (
         <div className="py-6 px-0 relative flex flex-col group/item first:pt-1">
@@ -111,6 +114,14 @@ const ListItem = ({ item, index, permissions, onEdit, onView, onDelete, options 
                         <div className="font-semibold">{formatValue(item?.[field?.value])}</div>
                     </Col>
                 ))}
+                {incidenteModel?.extra_fields
+                    ?.filter((e: any) => e?.title)
+                    ?.map((field: any, i: number) => (
+                        <Col span={12} key={`t-${i}`} className="flex gap-3">
+                            <div className="text-gray-400">{field?.title}:</div>
+                            <div className="font-semibold">{item?.[formatJsonField(field?.title)] || "-"}</div>
+                        </Col>
+                    ))}
             </Row>
             <div className="absolute right-0 hidden group-hover/item:block">
                 <Dropdown

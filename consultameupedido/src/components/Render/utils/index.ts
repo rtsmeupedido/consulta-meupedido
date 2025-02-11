@@ -82,7 +82,6 @@ export const parseFilter = (text: string, returnType: boolean = false) => {
             : { _id: textFilter };
     }
 };
-
 const isCPF = (text: string): boolean => {
     const cpfRegex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
     return cpfRegex.test(text);
@@ -97,11 +96,18 @@ export const parsePackageStatus = (status: string) => {
         return "-";
     }
 };
-
 export function capitalize(s: string) {
     return String(s[0]).toUpperCase() + String(s).slice(1);
 }
 
+export function formatJsonField(field: string) {
+    return field
+        .normalize("NFD") // Remove acentos
+        .replace(/[\u0300-\u036f]/g, "") // Remove os diacríticos
+        .replace(/[\/\\]/g, "") // Remove barras
+        .replace(/\s+/g, "_") // Substitui espaços por _
+        .toLowerCase(); // Converte para minúsculas
+}
 interface logInterface {
     actionCallType: "function" | "create" | "update" | "delete" | "query";
     actionCallName: string;

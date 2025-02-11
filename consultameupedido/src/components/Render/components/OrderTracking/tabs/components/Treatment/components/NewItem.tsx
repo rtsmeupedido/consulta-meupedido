@@ -2,6 +2,7 @@ import { Input, InputNumber, Cascader, Select, Row, Col, Button } from "antd";
 import { optionsSAC } from "../util";
 import { Controller, useForm } from "react-hook-form";
 import { useState } from "react";
+import { formatJsonField } from "../../../../../../utils";
 
 type Props = {
     onSave: (data: any) => void;
@@ -9,9 +10,10 @@ type Props = {
     values: any;
     readOnly?: boolean;
     options?: any[];
+    optionsFlat?: any[];
 };
 
-export default function NewItem({ onSave, onCancel, values, readOnly, options }: Props) {
+export default function NewItem({ onSave, onCancel, values, readOnly, options, optionsFlat }: Props) {
     const [loadingSend, setLoadingSend] = useState(false);
     const {
         control,
@@ -23,7 +25,12 @@ export default function NewItem({ onSave, onCancel, values, readOnly, options }:
         defaultValues: values,
     });
     const incidente = watch("incidente");
+    const incidenteId = watch("incidente_id");
+
+    const incidenteModel = optionsFlat?.find((e) => e._id === incidenteId);
+
     const tratativa = watch("sac");
+
     const onSubmit = async (data: any) => {
         try {
             setLoadingSend(true);
@@ -84,16 +91,18 @@ export default function NewItem({ onSave, onCancel, values, readOnly, options }:
                                 />
                                 {errors?.numero_ticket && <span className="text-red-500 text-xs">Campo obrigatório</span>}
                             </div>
-                            {incidente?.[0] === "qualidade" && (
-                                <div className="flex flex-col flex-1 gap-1">
-                                    <span className="text-xs">Descrição da peça</span>
-                                    <Controller
-                                        name="descricao"
-                                        control={control}
-                                        render={({ field }) => <Input.TextArea readOnly={readOnly} className="text-xs" value={field.value} rows={5} onChange={(e) => setValue(field.name, e.target.value)} />}
-                                    />
-                                </div>
-                            )}
+                            {incidenteModel?.extra_fields
+                                ?.filter((e: any) => e?.title)
+                                .map((ex: any) => (
+                                    <div key={ex?._id} className="flex flex-col flex-1 gap-1">
+                                        <span className="text-xs">{ex?.title}</span>
+                                        <Controller
+                                            name={formatJsonField(ex?.title)}
+                                            control={control}
+                                            render={({ field }) => <Input readOnly={readOnly} className="text-xs h-8" value={field.value} onChange={(e) => setValue(field.name, e.target.value)} />}
+                                        />
+                                    </div>
+                                ))}
                             <div className="flex flex-col flex-1 gap-1">
                                 <span className="text-xs">Tratativa SAC</span>
                                 <Controller

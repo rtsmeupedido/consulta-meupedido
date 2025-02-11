@@ -13,6 +13,7 @@ type Props = {
 
 export default function Treatment({ order }: Props) {
     const [options, setOptions] = useState<any>([]);
+    const [optionsFlat, setOptionsFlat] = useState<any>([]);
     const [isOpenNew, setIsOpenNew] = useState(false);
     const [loading, setLoading] = useState(true);
     const [isReadOnly, setIsReadOnly] = useState(false);
@@ -26,7 +27,8 @@ export default function Treatment({ order }: Props) {
                 setPermissions(data);
             });
             await list("classificacoes_tratativas", {}, undefined, "query", { __created: 1 }).then(({ data }) => {
-                const formatData = data.map((e: any) => ({ ...e, label: e?.name, value: e?._id }));
+                setOptionsFlat(data);
+                const formatData = (data || [])?.map((e: any) => ({ ...e, label: e?.name, value: e?._id }));
                 const _res = arrayToTree(formatData, {
                     parentProperty: "parent",
                     customID: "_id",
@@ -116,7 +118,7 @@ export default function Treatment({ order }: Props) {
                     </Button>
                 )}
             </div>
-            <ListGrid options={options} data={data} loading={loading} permissions={permissions?.tratativas} onDelete={onDelete} onEdit={onEdit} />
+            <ListGrid options={options} optionsFlat={optionsFlat} data={data} loading={loading} permissions={permissions?.tratativas} onDelete={onDelete} onEdit={onEdit} />
             <Modal
                 destroyOnClose
                 title={"Incidente"}
@@ -137,6 +139,7 @@ export default function Treatment({ order }: Props) {
                 <NewItem
                     values={selected}
                     options={options}
+                    optionsFlat={optionsFlat}
                     readOnly={isReadOnly}
                     onSave={async (data: any) => {
                         await onCreate(data);
