@@ -73,6 +73,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                     return;
                 });
 
+<<<<<<< HEAD
             if (response.data?.User && response?.data?.User._id) {
                 api.defaults.baseURL = response?.data?.uri;
                 api.defaults.headers.common["Authorization"] = `Bearer ${response?.data?.Token}`;
@@ -83,6 +84,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 localStorage.setItem("@uri-tck-meupedido-zendesk", response?.data?.uri);
                 setUri(response?.data?.uri);
                 setUser(response?.data?.User);
+=======
+            if (response?.User && response?.User._id) {
+                api.defaults.baseURL = response?.uri;
+                api.defaults.headers.common["Authorization"] = `Bearer ${response?.Token}`;
+                localStorage.setItem("@name-tck-meupedido-zendesk", response?.User.name);
+                localStorage.setItem("@id-tck-meupedido-zendesk", response?.User._id.toString());
+                localStorage.setItem("@token-tck-meupedido-zendesk", response?.Token);
+                localStorage.setItem("@organizations_id-tck-meupedido-zendesk", response?.User.organizations_id);
+                localStorage.setItem("@uri-tck-meupedido-zendesk", response?.uri);
+                setUri(response?.uri);
+                setUser(response?.User);
+>>>>>>> 3e1534e557dac41e38eda1e46a9e6361e9728ef1
             } else {
                 throw new Error("Invalid response data");
             }

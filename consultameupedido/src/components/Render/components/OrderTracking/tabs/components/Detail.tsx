@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { Button, Divider, MuiIcon, Tag, Tooltip } from "rtk-ux";
+=======
+import { Divider, MuiIcon, Tag, Tooltip } from "rtk-ux";
+>>>>>>> 3e1534e557dac41e38eda1e46a9e6361e9728ef1
 import dayjs from "dayjs";
 import { parsePackageStatus } from "../../../../utils";
 
@@ -22,7 +26,10 @@ export default function PackageDetail({ orderSelected, onGetNf }: { orderSelecte
     };
     const payments = orderSelected?.paymentData?.transactions?.[0]?.payments || [];
     const giftCards = (orderSelected?.paymentData?.giftCards || [])?.filter((g: any) => g?.inUse);
+<<<<<<< HEAD
     const nf = orderSelected?.packageAttachment?.packages?.[0]?.invoiceKey;
+=======
+>>>>>>> 3e1534e557dac41e38eda1e46a9e6361e9728ef1
     return (
         <div className="flex flex-col pb-3 text-xs">
             <Info title="Cliente">
