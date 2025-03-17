@@ -5,9 +5,11 @@ import { Collapse, Divider, Timeline, Tooltip } from "antd";
 export default function LiveEvents({ order }: any) {
     const [data, setData] = useState<any>([]);
     const init = async () => {
-        const pck = order?.package_events?.sort((a: any, b: any) => {
-            return new Date(a?.event_date).getTime() - new Date(b?.event_date).getTime();
-        });
+        const pck = order?.package_events
+            ?.filter((e: any) => e?._id)
+            ?.sort((a: any, b: any) => {
+                return new Date(a?.event_date).getTime() - new Date(b?.event_date).getTime();
+            });
         function agruparPorStatus(data: any) {
             let lastStatus: string | null = null;
             return data.map((item: any) => {

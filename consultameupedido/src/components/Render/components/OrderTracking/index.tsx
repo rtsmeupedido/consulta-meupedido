@@ -5,7 +5,7 @@ import { list } from "../../api";
 import { Loader, Table } from "rtk-ux";
 import dayjs from "dayjs";
 import Tab from "./tabs";
-import { parseFilter, parsePackageStatus } from "../../utils";
+import { parseFilter, parsePackageStatus, saveLog } from "../../utils";
 import HeaderSearch from "../HeaderSearch";
 
 export default function OrderTracking({ onGetNf, brands, userBrands }: { onGetNf: (str: string) => void; brands: any; userBrands: any }) {
@@ -24,22 +24,20 @@ export default function OrderTracking({ onGetNf, brands, userBrands }: { onGetNf
         setLoading(true);
         const getItems = async (doc: string) => {
             const textFilter: string = doc ? doc : text;
-            return await list(
-                "mp_packages_last_status",
-                {
-                    before_filter: {
-                        ...parseFilter(textFilter),
-                        hostname:
-                            userBrands?.length > 0
-                                ? {
-                                      $in: (userBrands || [])?.map((e: any) => e?.nome_vtex),
-                                  }
-                                : undefined,
-                    },
+            const filter = {
+                before_filter: {
+                    ...parseFilter(textFilter),
+                    hostname:
+                        userBrands?.length > 0
+                            ? {
+                                  $in: (userBrands || [])?.map((e: any) => e?.nome_vtex),
+                              }
+                            : undefined,
                 },
-                {},
-                "query"
-            )
+            };
+            saveLog({ actionCallType: "query", actionCallName: "mp_packages_last_status", actionDescription: `Consulta pacote: ${textFilter}`, actionCallDataSent: filter });
+
+            return await list("mp_packages_last_status", filter, {}, "query")
                 .then(({ data }: any) => {
                     if (!data || data?.length === 0) {
                         alert("Error");

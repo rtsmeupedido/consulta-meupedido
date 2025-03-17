@@ -9,6 +9,7 @@ import { message } from "antd";
 import Devolution from "../../components/Devolution";
 import { downloadNf, execFunc, list, show } from "../../api";
 import DevolutionRequest from "../../components/DevolutionRequest";
+import GiftCard from "../../components/GiftCard";
 
 const Home = () => {
     const keyMsg = "msg-order-updatable";
@@ -16,6 +17,7 @@ const Home = () => {
     const zafClient = useZaf();
     const { logout } = useAuth();
     const [showLogout, setShowLogout] = useState(false);
+    const [versionApp, setVersionApp] = useState(null);
     const [brands, setBrands] = useState<any>([]);
     const [userBrands, setUserBrands] = useState<any>(null);
     const [active, setActive] = useState("order");
@@ -45,7 +47,7 @@ const Home = () => {
                         duration: 2,
                     });
                     if (data.type === "download") {
-                        downloadNf(data, `nf-${key}.pdf`);
+                        downloadNf(data?.url, `nf-${key}.pdf`);
                     } else if (data.type === "open") {
                         window.open(data.url, "_blank");
                     }
@@ -63,8 +65,14 @@ const Home = () => {
         //@ts-ignore
         const t: any = await zafClient.zafClient?.get("viewport.size");
         zafClient.zafClient?.invoke("resize", { width: (t?.["viewport.size"].width || 1000) * 0.85, height: (t?.["viewport.size"].height || 600) - 150 });
+        zafClient.zafClient?.metadata().then(function (metadata) {
+            //@ts-ignore
+            if (metadata?.version) {
+                //@ts-ignore
+                setVersionApp(metadata?.version);
+            }
+        });
     }
-
     const getBrands = async () => {
         const _id = localStorage.getItem("@id-tck-meupedido-zendesk");
         if (_id) {
@@ -81,6 +89,7 @@ const Home = () => {
                 console.log(error);
             });
     };
+
     const filterBrands = brands
         .filter((e: any) => userBrands?.includes(e.nome_vtex))
         .map((e: any) => ({
@@ -92,7 +101,7 @@ const Home = () => {
         init();
         getBrands();
     }, []);
-
+    const userName = localStorage.getItem("@name-tck-meupedido-zendesk");
     return (
         <div className="flex flex-col gap-3 p-4">
             {contextHolder}
@@ -105,9 +114,12 @@ const Home = () => {
                         </Button>
                     ))}
                 </div>
-                <Button icon={<MuiIcon icon={["mui", "logout"]} color="white" />} className="bg-gray-400 hover:bg-gray-500 text-white" type="text" onClick={() => setShowLogout(true)}>
-                    Fazer logoff
-                </Button>
+                <div className="flex items-center gap-2">
+                    {userName && <div className="text-xs">Usuário: {userName}</div>}
+                    <Button icon={<MuiIcon icon={["mui", "logout"]} color="white" />} className="bg-gray-400 hover:bg-gray-500 text-white" type="text" onClick={() => setShowLogout(true)}>
+                        Fazer logoff
+                    </Button>
+                </div>
             </div>
             <Divider className="my-1" />
             <div className={active === "order" ? "block" : "hidden"}>
@@ -121,6 +133,9 @@ const Home = () => {
             </div>
             <div className={active === "request_devolution" ? "block" : "hidden"}>
                 <DevolutionRequest brands={brands} userBrands={filterBrands} />
+            </div>
+            <div className={active === "gift_card" ? "block" : "hidden"}>
+                <GiftCard userBrands={filterBrands} />
             </div>
             <Modal
                 centered
@@ -140,6 +155,7 @@ const Home = () => {
                     Tem certeza que deseja realizar logoff?
                 </div>
             </Modal>
+            {versionApp ? <div className="fixed bottom-0.5 text-gray-300 left-1 text-[10px]">{`${versionApp}`}</div> : ""}
         </div>
     );
 };
@@ -151,4 +167,5 @@ const tabs = [
     { name: "Produtos", keyname: "product", icon: ["muil", "dry_cleaning"] },
     { name: "Troquecommerce", keyname: "request_devolution", icon: ["muil", "youtube_searched_for"] },
     { name: "Devolução bipada", keyname: "devolution", icon: ["muil", "rotate_90_degrees_ccw"] },
+    { name: "Gift card", keyname: "gift_card", icon: ["muil", "card_giftcard"] },
 ];

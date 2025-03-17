@@ -5,7 +5,7 @@ import { Col, Image, Loader, Row } from "rtk-ux";
 import { execFunc } from "../../api";
 import HeaderSearch from "../HeaderSearch";
 import dayjs from "dayjs";
-import { parseFilter } from "../../utils";
+import { parseFilter, saveLog } from "../../utils";
 import DevolutionTable from "../DevolutionTable";
 
 export default function DevolutionRequest({ brands, userBrands }: { brands: any; userBrands: any }) {
@@ -32,7 +32,9 @@ export default function DevolutionRequest({ brands, userBrands }: { brands: any;
         setInfo(null);
         setError("");
         const filter = parseFilter(text, true);
-        await execFunc("zd_consulta_troquecommerce", { filter: filter?.filter, type: filter?.type, userBrands }, controller.signal)
+        const sendFilter = { filter: filter?.filter, type: filter?.type, userBrands };
+        saveLog({ actionCallType: "function", actionCallName: "zd_consulta_troquecommerce", actionDescription: `Consultou TroquEcommerce: ${text}`, actionCallDataSent: sendFilter });
+        await execFunc("zd_consulta_troquecommerce", sendFilter, controller.signal)
             .then(({ data }) => {
                 setCode(text);
                 if (data.returnValues) {
@@ -136,13 +138,13 @@ export default function DevolutionRequest({ brands, userBrands }: { brands: any;
                                                     <Col span={8} className="text-black font-semibold">
                                                         {info?.tracking?.courier_collect_number}
                                                     </Col>
-                                                    {/* <Col span={5} className="text-gray-400">
-                                                        Prazo para postagem:
+                                                    <Col span={5} className="text-gray-400">
+                                                        Validadade do código de postagem:
                                                     </Col>
                                                     <Col span={7} className="text-black font-semibold">
-                                                        {"-"}
-                                                    </Col> */}
-                                                    <Col span={12} />
+                                                        {info?.tracking?.due_date ? dayjs(info?.tracking?.due_date).format("DD/MM/YYYY") : "-"}
+                                                    </Col>
+                                                    {/* <Col span={12} /> */}
                                                     <Col span={4} className="text-gray-400">
                                                         Rastreio:
                                                     </Col>
@@ -238,7 +240,7 @@ export default function DevolutionRequest({ brands, userBrands }: { brands: any;
                                                             Validade:
                                                         </Col>
                                                         <Col span={10} className="text-black font-semibold">
-                                                            {info?.reverse_coupon.validity ? dayjs(info?.reverse_coupon.validity).format("DD/MM/YYYY") : "-"}
+                                                            {info?.reverse_coupon?.validity ? dayjs(info?.reverse_coupon?.validity).format("DD/MM/YYYY") : "-"}
                                                         </Col>
                                                         <Col span={4} className="text-gray-400">
                                                             Valor:
@@ -287,7 +289,7 @@ export default function DevolutionRequest({ brands, userBrands }: { brands: any;
                                                             Data:
                                                         </Col>
                                                         <Col span={8} className="text-black font-semibold">
-                                                            {info?.reverse_payment?.created_at ? dayjs(info.reverse_payment.created_at).format("DD/MM/YYYY") : "-"}
+                                                            {info?.reverse_payment?.created_at ? dayjs(info?.reverse_payment?.created_at).format("DD/MM/YYYY") : "-"}
                                                         </Col>
                                                     </Row>
                                                 </Col>
