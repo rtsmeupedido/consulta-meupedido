@@ -111,11 +111,7 @@ export default function OrderTracking({ onGetNf, brands, userBrands }: { onGetNf
                                             title: "Status",
                                             align: "center",
                                             width: 190,
-                                            render: (info, rowData) => (
-                                                <div onClick={() => console.log(info)} className="capitalize">
-                                                    {parsePackageStatus(rowData?._last_status?.name || "-")}
-                                                </div>
-                                            ),
+                                            render: (__info, rowData) => <div className="capitalize">{parsePackageStatus(rowData?._last_status?.name || "-")}</div>,
                                         },
                                     ]}
                                 />

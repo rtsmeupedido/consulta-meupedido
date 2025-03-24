@@ -105,6 +105,41 @@ export const create = (datasource?: string, data?: any, form: string | null = nu
     });
 };
 
+export const pushItem = ({ datasource, idDocument, fieldItem, data = {} }: { datasource: string; idDocument: string; fieldItem: string; data: any }) => {
+    return new Promise((resolve) => {
+        const url = `/api/push/${datasource}`;
+        const model = {
+            _id: idDocument,
+            field: fieldItem,
+            data,
+        };
+
+        api.post(url, model)
+            .then((response) => {
+                resolve(response.data);
+            })
+            .catch((error) => {
+                resolve(error.response.data);
+            });
+    });
+};
+export const removeItem = ({ datasource, idDocument, idItem, fieldItem }: { datasource: string; idDocument: string; idItem: string; fieldItem: string }) => {
+    return new Promise((resolve) => {
+        const url = `/api/delete-item/${datasource}/${idDocument}`;
+        const data: any = {
+            id_item: idItem,
+            field: fieldItem,
+        };
+        api.delete(url, { data })
+            .then((response) => {
+                resolve(response.data);
+            })
+            .catch((error) => {
+                resolve(error.response.data);
+            });
+    });
+};
+
 export const execFunc = (keyname?: string, data?: any, axiosController?: any): Promise<any> => {
     return new Promise((resolve) => {
         const url = `/api/func/${keyname}?is_server=false`;

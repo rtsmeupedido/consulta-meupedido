@@ -1,7 +1,7 @@
 import NewItem from "./components/NewItem";
 import { Button, Modal } from "rtk-ux";
 import { useEffect, useState } from "react";
-import { create, execFunc, list, remove, update } from "../../../../../api";
+import { create, execFunc, list, pushItem, remove, removeItem, update } from "../../../../../api";
 import ListGrid from "./components/ListGrid";
 import arrayToTree from "array-to-tree";
 import { options as defOptions } from "./util";
@@ -60,11 +60,27 @@ export default function Treatment({ order }: Props) {
             await update("tratativas_atendimento", data);
         } else {
             saveLog({ actionCallType: "create", actionCallName: "tratativas_atendimento", actionDescription: `Criou uma nova incidência: ${order?.orderId}`, actionCallDataSent: data });
-            await create("tratativas_atendimento", {
+            const trat = await create("tratativas_atendimento", {
                 ...data,
                 orderId: order?.orderId,
                 name: `${order?.orderId} - ${data?.numero_ticket}`,
             });
+            try {
+                const tratLog = {
+                    _id: trat?.data?._id,
+                    name: `${order?.orderId} - ${data?.numero_ticket}`,
+                    __encerra_ciclo_cliente: data?.encerra_ciclo_pedido_cliente,
+                };
+                await pushItem({ datasource: "mp_packages", idDocument: order._id, fieldItem: "__tratativas_zendesk", data: tratLog });
+                await pushItem({ datasource: "mp_opened_packages", idDocument: order._id, fieldItem: "__tratativas_zendesk", data: tratLog });
+                const incidenteModel = optionsFlat?.find((e: any) => e._id === data?.incidente_id);
+                if (incidenteModel?.encerra_ciclo_pedido_cliente) {
+                    update("mp_packages", { _id: order?.orderId, __encerra_ciclo_cliente: true });
+                    update("mp_opened_packages", { _id: order?.orderId, __encerra_ciclo_cliente: true });
+                }
+            } catch (error) {
+                console.error(error);
+            }
         }
         setIsOpenNew(false);
         setSelected(null);
@@ -72,6 +88,8 @@ export default function Treatment({ order }: Props) {
     }
     async function onDelete(data: any) {
         if (!data?._id) return;
+        const incidenteModel = optionsFlat?.find((e: any) => e._id === data?.incidente_id);
+
         setLoading(true);
         saveLog({ actionCallType: "delete", actionCallName: "tratativas_atendimento", actionDescription: `Apagou uma incidência: ${data?._id}`, actionCallDataSent: data });
         await remove("tratativas_atendimento", data?._id)
@@ -80,6 +98,16 @@ export default function Treatment({ order }: Props) {
                 init();
             })
             .catch(() => {});
+        try {
+            await removeItem({ datasource: "mp_packages", idDocument: order._id, fieldItem: "__tratativas_zendesk", idItem: data._id });
+            await removeItem({ datasource: "mp_opened_packages", idDocument: order._id, fieldItem: "__tratativas_zendesk", idItem: data._id });
+            if (incidenteModel?.encerra_ciclo_pedido_cliente) {
+                update("mp_packages", { _id: order?.orderId, __encerra_ciclo_cliente: false });
+                update("mp_opened_packages", { _id: order?.orderId, __encerra_ciclo_cliente: false });
+            }
+        } catch (error) {
+            console.error(error);
+        }
         setLoading(false);
     }
     async function onEdit(data: any, readOnly?: boolean) {

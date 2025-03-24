@@ -109,17 +109,10 @@ export function formatJsonField(field: string) {
         .toLowerCase(); // Converte para minúsculas
 }
 interface logInterface {
-<<<<<<< HEAD
     actionCallType: "function" | "create" | "update" | "delete" | "query" | "api";
     actionCallName?: string;
     actionDescription?: string;
     actionCallDataSent?: any;
-=======
-    actionCallType: "function" | "create" | "update" | "delete" | "query";
-    actionCallName: string;
-    actionDescription: string;
-    actionCallDataSent: any;
->>>>>>> 3e1534e557dac41e38eda1e46a9e6361e9728ef1
 }
 
 export const saveLog = async ({ actionCallType, actionCallName, actionDescription, actionCallDataSent }: logInterface) => {

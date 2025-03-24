@@ -36,7 +36,6 @@ export default function GiftCard({ userBrands }: { userBrands: any }) {
         await axios
             .request(configFoxton)
             .then((response) => {
-                console.log("🚀 ~ response:", response.data);
                 setBrands(response.data);
             })
             .catch((error) => {
