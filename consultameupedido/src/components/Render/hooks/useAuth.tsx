@@ -54,9 +54,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             type: "POST",
             contentType: "application/json",
             headers: {
-                Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiaWF0IjoxNzIwNDY3NDM1fQ.raSxUyF8rwGSnOL_nna6lls3DC2Lyen-GSgGG3Ht5UE`,
+                Authorization: `Bearer {{setting.apiToken}}`,
             },
-            // secure: true,
+            secure: true,
             data: data,
         };
 
