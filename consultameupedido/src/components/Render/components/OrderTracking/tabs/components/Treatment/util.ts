@@ -77,7 +77,7 @@ export const optionsSAC = [
         label: "Estorno na forma de pagamento",
         value: "1",
         fields: [
-            { value: "valor", label: "Valor" },
+            { value: "valor", type: "currency", label: "Valor" },
             { value: "nsu", label: "NSU" },
         ],
     },
@@ -86,7 +86,7 @@ export const optionsSAC = [
         value: "2",
         fields: [
             { value: "codigo_vale", label: "Código do vale" },
-            { value: "valor", label: "Valor" },
+            { value: "valor", type: "currency", label: "Valor" },
             { value: "validade", label: "Validade", type: "date" },
         ],
     },
@@ -95,7 +95,7 @@ export const optionsSAC = [
         value: "3",
         fields: [
             { value: "codigo_vale", label: "Código do vale" },
-            { value: "valor", label: "Valor" },
+            { value: "valor", type: "currency", label: "Valor" },
             { value: "validade", label: "Validade", type: "date" },
             {
                 value: "numero_pedido_gerado",
@@ -135,7 +135,7 @@ export const optionsSAC = [
                 value: "numero_chamado_deposito",
                 label: "Número do chamado de depósito",
             },
-            { value: "valor", label: "Valor" },
+            { value: "valor", type: "currency", label: "Valor" },
             { value: "sac_descricao", label: "Descrição", type: "textarea" },
         ],
     },

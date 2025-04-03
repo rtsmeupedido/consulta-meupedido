@@ -2,6 +2,8 @@ import { Tabs } from "rtk-ux";
 import LiveEvents from "./components/LiveEvents";
 import PackageDetail from "./components/Detail";
 import Treatment from "./components/Treatment";
+import TimeLine from "./components/TimeLine";
+
 export default function Tab({ order, onGetNf }: { order: any; onGetNf: (str: string) => void }) {
     return (
         <Tabs
@@ -47,6 +49,20 @@ export default function Tab({ order, onGetNf }: { order: any; onGetNf: (str: str
                             }}
                         >
                             <Treatment order={order} />
+                        </div>
+                    ),
+                },
+                {
+                    label: <div className="text-xs">Timeline</div>,
+                    key: "timeline",
+                    children: (
+                        <div
+                            className="overflow-auto"
+                            style={{
+                                height: "calc(100vh - 200px)",
+                            }}
+                        >
+                            <TimeLine order={order} />
                         </div>
                     ),
                 },

@@ -1,8 +1,9 @@
-import { Input, InputNumber, Cascader, Select, Row, Col, Button } from "antd";
+import { useState } from "react";
 import { optionsSAC } from "../util";
 import { Controller, useForm } from "react-hook-form";
-import { useState } from "react";
+import CurrencyFormat from "react-currency-format";
 import { formatJsonField } from "../../../../../../utils";
+import { Input, Cascader, Select, Row, Col, Button } from "antd";
 
 type Props = {
     onSave: (data: any) => void;
@@ -146,12 +147,30 @@ export default function NewItem({ onSave, onCancel, values, readOnly, options, o
                                                                         onChange={(e) => setValue(field.name, e.target.value)}
                                                                     />
                                                                 ) : item?.type === "number" ? (
-                                                                    <InputNumber
+                                                                    <Input
                                                                         status={isError ? "error" : undefined}
                                                                         readOnly={readOnly}
                                                                         className="w-full text-xs h-8 flex items-center"
                                                                         value={field.value}
-                                                                        onChange={(num) => setValue(field.name, num)}
+                                                                        pattern="[0-9.,]*"
+                                                                        onChange={(e) => {
+                                                                            if (/^[\d.,]*$/.test(e.target.value)) {
+                                                                                setValue(field.name, e.target.value);
+                                                                            }
+                                                                        }}
+                                                                    />
+                                                                ) : item?.type === "currency" ? (
+                                                                    <CurrencyFormat
+                                                                        prefix={"R$"}
+                                                                        thousandSeparator={"."}
+                                                                        decimalSeparator={","}
+                                                                        decimalScale={2}
+                                                                        fixedDecimalScale
+                                                                        className="pl-2.5 text-xs h-8 border rounded-md focus:outline-none focus:border-blue-400 hover:border-blue-400 transition-all"
+                                                                        value={field?.value}
+                                                                        onValueChange={({ floatValue }) => {
+                                                                            setValue(field.name, floatValue ? floatValue : "");
+                                                                        }}
                                                                     />
                                                                 ) : (
                                                                     <Input status={isError ? "error" : undefined} readOnly={readOnly} className="text-xs h-8" value={field.value} onChange={(e) => setValue(field.name, e.target.value)} />

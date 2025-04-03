@@ -1,13 +1,15 @@
 import dayjs from "dayjs";
 import { useState } from "react";
 import { message, MuiIcon, Table, Tag, Tooltip } from "rtk-ux";
+import { formatCNPJ } from "../../utils";
 
 type Props = {
     data: any;
+    onOpenActions: (a: any) => void;
     items: any[];
 };
 
-export default function Brand({ data, items }: Props) {
+export default function Brand({ data, items, onOpenActions }: Props) {
     const [showDetail, setShowDetail] = useState(true);
     function onSelect() {
         setShowDetail(!showDetail);
@@ -58,7 +60,7 @@ export default function Brand({ data, items }: Props) {
                                 render: (code) => (
                                     <Tooltip title="Copiar">
                                         <div
-                                            className="cursor-pointer text-blue-600"
+                                            className="cursor-pointer text-blue-600 whitespace-nowrap text-ellipsis overflow-hidden"
                                             onClick={() => {
                                                 navigator.clipboard.writeText(code);
                                                 message.success("Código copiado");
@@ -105,10 +107,6 @@ export default function Brand({ data, items }: Props) {
                                         maximumFractionDigits: 2,
                                     }).format(vl),
                             },
-                            { title: "DOCUMENTO", dataIndex: "document", width: 150 },
-                            { title: "CNPJ", dataIndex: "cnpj", width: 140 },
-                            { title: "STATUS", dataIndex: "enabled", width: 100, ellipsis: true, render: (enable) => <Tag color={enable ? "blue" : "red"}>{enable ? "Habilitado" : "Desabilitado"}</Tag> },
-                            { title: "DATA DE EXPIRAÇÃO", dataIndex: "expiration_date", render: (date) => (date ? dayjs(date).format("DD/MM/YY HH:mm") : "-"), width: 180, align: "center" },
                             {
                                 title: "EXPIRADO",
                                 dataIndex: "expiration_date",
@@ -116,10 +114,33 @@ export default function Brand({ data, items }: Props) {
                                     const expired = dayjs(date).isBefore(dayjs()) ? true : false;
                                     return date ? <Tag color={expired ? "red" : "green"}>{expired ? "Sim" : "Não"}</Tag> : "-";
                                 },
-                                width: 180,
+                                width: 160,
                                 align: "center",
                             },
-                            // { title: "AÇÕES", width: 130, dataIndex: "id", render: () => <MuiIcon className="mt-2 cursor-pointer" width={10} icon={["muil", "share"]} color="#19add6" /> },
+                            {
+                                title: "STATUS",
+                                dataIndex: "enabled",
+                                align: "center",
+                                width: 120,
+                                ellipsis: true,
+                                render: (enable) => (
+                                    <Tag className="mx-auto" color={enable ? "blue" : "red"}>
+                                        {enable ? "Habilitado" : "Desabilitado"}
+                                    </Tag>
+                                ),
+                            },
+
+                            { title: "DOCUMENTO", dataIndex: "document", width: 150 },
+                            { title: "CNPJ", dataIndex: "cnpj", width: 170, render: (c) => formatCNPJ(c) },
+                            { title: "DATA DE EXPIRAÇÃO", dataIndex: "expiration_date", render: (date) => (date ? dayjs(date).format("DD/MM/YY HH:mm") : "-"), width: 180, align: "center" },
+                            {
+                                title: "",
+                                width: 40,
+                                align: "center",
+                                dataIndex: "id",
+                                fixed: "right",
+                                render: (_, row) => <MuiIcon className="mt-2 cursor-pointer" width={14} icon={["muil", "remove_red_eye"]} color="#508adc" onClick={() => onOpenActions(row)} />,
+                            },
                         ]}
                         scroll={{ x: 100 }}
                         size="small"

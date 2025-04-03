@@ -65,7 +65,7 @@ const Home = () => {
         //@ts-ignore
         const t: any = await zafClient.zafClient?.get("viewport.size");
         zafClient.zafClient?.invoke("resize", { width: (t?.["viewport.size"].width || 1000) * 0.85, height: (t?.["viewport.size"].height || 600) - 150 });
-        zafClient.zafClient?.metadata().then(function (metadata) {
+        zafClient.zafClient?.metadata().then(function (metadata: any) {
             //@ts-ignore
             if (metadata?.version) {
                 //@ts-ignore
