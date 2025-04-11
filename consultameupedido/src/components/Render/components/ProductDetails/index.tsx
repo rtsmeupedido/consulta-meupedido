@@ -5,7 +5,7 @@ import { Table, Divider, Loader } from "rtk-ux";
 import { execFunc } from "../../api";
 import HeaderSearch from "../HeaderSearch";
 import { saveLog } from "../../utils";
-export default function ProductDetails({ userBrands }: any) {
+export default function ProductDetails() {
     const div_ref = useRef<any>(null);
     const [loading, setLoading] = useState(false);
     const [errorMsg, seterrorMsg] = useState("Nenhum produto selecionado");
@@ -19,7 +19,7 @@ export default function ProductDetails({ userBrands }: any) {
         setSignal(controller);
         seterrorMsg("Nenhum produto selecionado.");
         setLoading(true);
-        const filter = { text, userBrands };
+        const filter = { text };
         saveLog({ actionCallType: "function", actionCallName: "conexao_sql_bdviews_zd", actionDescription: `Consulta produto pela referência: ${text}`, actionCallDataSent: filter });
 
         await execFunc("conexao_sql_bdviews_zd", filter, controller.signal)
@@ -55,7 +55,6 @@ export default function ProductDetails({ userBrands }: any) {
             <Style.Style className={`w-full h-full overflow-auto`} ref={div_ref}>
                 <div className="flex gap-2 flex-col flex-1">
                     <HeaderSearch
-                        userBrands={userBrands}
                         placeholder="Referência"
                         onChange={(text) => handleFilter(text)}
                         loading={loading}

@@ -7,7 +7,7 @@ import HeaderSearch from "../HeaderSearch";
 import { Loader, Modal, Table } from "rtk-ux";
 import dayjs from "dayjs";
 
-export default function GiftCard({ userBrands }: { userBrands: any }) {
+export default function GiftCard() {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [client, setClient] = useState<any>(null);
@@ -25,8 +25,7 @@ export default function GiftCard({ userBrands }: { userBrands: any }) {
             if (data) {
                 setClient(data);
             } else {
-                setError("Nenhum cliente encontrado");
-                return;
+                setClient({ firstname: text, lastname: "" });
             }
         });
         const configFoxton = {
@@ -88,7 +87,7 @@ export default function GiftCard({ userBrands }: { userBrands: any }) {
             const configFoxton = {
                 method: "get",
                 maxBodyLength: Infinity,
-                url: `https://api-motorpromocao.ciahering.com.br/clients/${row.document}/accounts?user_code=joao.santos@somagrupo.com.br&page=1&per_page=100&sort=desc&status=creation,expiration,consumption,chargeBack,update`,
+                url: `https://api-motorpromocao.ciahering.com.br/clients/${row.document}/accounts?user_code=${row?.user_code}&page=1&per_page=100&sort=desc&status=creation,expiration,consumption,chargeBack,update`,
                 headers: {
                     Authorization: `Bearer ${import.meta.env.VITE_MOTOR_API_TOKEN}`,
                 },
@@ -126,7 +125,7 @@ export default function GiftCard({ userBrands }: { userBrands: any }) {
 
     return (
         <div className="flex flex-col gap-2 flex-1 overflow-auto" style={{ height: "calc(100vh - 100px)" }}>
-            <HeaderSearch placeholder="CPF" onChange={(text) => handleFilter(text)} loading={loading} userBrands={userBrands} />
+            <HeaderSearch placeholder="CPF" onChange={(text) => handleFilter(text)} loading={loading} />
             <div className="flex flex-col pt-4 flex-1 h-full">
                 {loading ? (
                     <div className="w-full h-full">

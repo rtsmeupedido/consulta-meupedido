@@ -8,7 +8,7 @@ import HeaderSearch from "../HeaderSearch";
 import DevolutionTable from "../DevolutionTable";
 import { parseFilter, saveLog } from "../../utils";
 
-export default function Devolution({ onGetNf, brands, userBrands }: { onGetNf: (str: string) => void; brands: any[]; userBrands: any }) {
+export default function Devolution({ onGetNf, brands }: { onGetNf: (str: string) => void; brands: any[] }) {
     const div_ref = useRef<any>(null);
     const [loading, setLoading] = useState(false);
     const [loadingPck, setLoadingPck] = useState(false);
@@ -40,7 +40,7 @@ export default function Devolution({ onGetNf, brands, userBrands }: { onGetNf: (
         if (filter?.type === "document") {
             setBigLoad(true);
         }
-        const filterFunc = { filter: filter?.filter, type: filter?.type, text, userBrands };
+        const filterFunc = { filter: filter?.filter, type: filter?.type, text };
         saveLog({ actionCallType: "function", actionCallName: "consulta_devolucao_wms_zd", actionDescription: `Consulta devolução bipada: ${text}`, actionCallDataSent: filterFunc });
         await execFunc("consulta_devolucao_wms_zd", filterFunc, controller.signal)
             .then(({ data }) => {
@@ -68,7 +68,6 @@ export default function Devolution({ onGetNf, brands, userBrands }: { onGetNf: (
             <Style.Style className={`w-full h-full`} ref={div_ref}>
                 <div className="flex gap-2 flex-col flex-1 overflow-hidden">
                     <HeaderSearch
-                        userBrands={userBrands}
                         placeholder="Pacote ou CPF"
                         onChange={(text) => handleFilter(text)}
                         loading={loading}

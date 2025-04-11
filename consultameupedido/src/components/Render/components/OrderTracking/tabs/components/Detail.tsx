@@ -39,11 +39,11 @@ export default function PackageDetail({ orderSelected, onGetNf }: { orderSelecte
             <Info title="Pedido">
                 <Row>
                     <RowItem field="Id:" value={orderSelected?.orderId} copy />
-                    <RowItem field="Status:" value={parsePackageStatus(orderSelected?._last_status?.name)} />
+                    <RowItem field="Situação:" value={orderSelected?.isCompleted} />
                 </Row>
                 <Row>
                     <RowItem field="Data:" value={orderSelected?.creationDate ? dayjs(orderSelected?.creationDate).format("DD/MM/YYYY HH:mm") : "-"} />
-                    <RowItem field="Seller:" value={orderSelected?.sellers?.[0]?.name || orderSelected?.sellers?.[0]?.id} />
+                    <RowItem field="Status:" value={parsePackageStatus(orderSelected?._last_status?.name)} />
                 </Row>
                 <Row>
                     <RowItem field="Canal:" value={orderSelected?.shippingData?.logisticsInfo?.[0]?.deliveryChannel} />
@@ -56,6 +56,7 @@ export default function PackageDetail({ orderSelected, onGetNf }: { orderSelecte
                 {orderSelected?.data_entrega_prevista && (
                     <Row>
                         <RowItem field="Previsão de entrega:" value={orderSelected?.data_entrega_prevista ? dayjs(orderSelected?.data_entrega_prevista).format("DD/MM/YYYY HH:mm") : "-"} />
+                        <RowItem field="Seller:" value={orderSelected?.sellers?.[0]?.name || orderSelected?.sellers?.[0]?.id} />
                     </Row>
                 )}
             </Info>
@@ -151,11 +152,11 @@ const Info = ({ title = "", children, actions }: any) => {
 const Row = ({ children }: any) => {
     return <div className="flex items-center mb-1">{children}</div>;
 };
-const RowItem = ({ field = "", value = "", copy = false, url = null, nf = false, onNf = () => {} }) => {
+const RowItem = ({ field = "", value = "", copy = false, col = false, url = null, nf = false, onNf = () => {} }) => {
     return (
-        <div className="flex items-center w-1/2">
+        <div className={`flex ${col ? "w-full flex-col" : "w-1/2 items-center"}`}>
             <div className="min-w-14 text-gray-400">{field}</div>
-            <div className="font-semibold overflow-hidden overflow-ellipsis ml-1">{value || "-"}</div>
+            <div className={`font-semibold overflow-hidden overflow-ellipsis ${col ? "mt-0.5" : "ml-1"}`}>{typeof value === "boolean" ? <Tag color={value ? "green" : "red"}>{value ? "" : "Incompleto"}</Tag> : value || "-"}</div>
             {value && url && (
                 <MuiIcon
                     icon={["mui", "link"]}

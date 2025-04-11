@@ -8,7 +8,7 @@ import dayjs from "dayjs";
 import { parseFilter, saveLog } from "../../utils";
 import DevolutionTable from "../DevolutionTable";
 
-export default function DevolutionRequest({ brands, userBrands }: { brands: any; userBrands: any }) {
+export default function DevolutionRequest({ brands }: { brands: any }) {
     const div_ref = useRef<any>(null);
     const [loading, setLoading] = useState(false);
     const [loadingPck, setLoadingPck] = useState(false);
@@ -32,7 +32,7 @@ export default function DevolutionRequest({ brands, userBrands }: { brands: any;
         setInfo(null);
         setError("");
         const filter = parseFilter(text, true);
-        const sendFilter = { filter: filter?.filter, type: filter?.type, userBrands };
+        const sendFilter = { filter: filter?.filter, type: filter?.type };
         saveLog({ actionCallType: "function", actionCallName: "zd_consulta_troquecommerce", actionDescription: `Consultou TroquEcommerce: ${text}`, actionCallDataSent: sendFilter });
         await execFunc("zd_consulta_troquecommerce", sendFilter, controller.signal)
             .then(({ data }) => {
@@ -65,7 +65,6 @@ export default function DevolutionRequest({ brands, userBrands }: { brands: any;
                         placeholder="Pacote ou CPF"
                         onChange={(text) => handleFilter(text)}
                         loading={loading}
-                        userBrands={userBrands}
                         onCancel={() => {
                             signal.abort();
                             setSignal(null);
