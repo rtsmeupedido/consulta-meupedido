@@ -1,6 +1,11 @@
-import { Button, Divider, MuiIcon, Tag, Tooltip } from "rtk-ux";
+import { Button, Divider, MuiIcon, Popover } from "rtk-ux";
 import dayjs from "dayjs";
-import { parsePackageStatus } from "../../../../utils";
+import { parsePackageStatus } from "../../../../../utils";
+import Info from "./components/Info";
+import Row from "./components/Row";
+import RowItem from "./components/RowItem";
+import Item from "./components/Item";
+import { Image } from "antd";
 
 export default function PackageDetail({ orderSelected, onGetNf }: { orderSelected: any; onGetNf: (str: string) => void }) {
     const currency = (value: number) => {
@@ -23,6 +28,7 @@ export default function PackageDetail({ orderSelected, onGetNf }: { orderSelecte
     const payments = orderSelected?.paymentData?.transactions?.[0]?.payments || [];
     const giftCards = (orderSelected?.paymentData?.giftCards || [])?.filter((g: any) => g?.inUse);
     const nf = orderSelected?.packageAttachment?.packages?.[0]?.invoiceKey;
+    console.log("🚀 ~ orderSelected?.isCompleted:", orderSelected?.isCompleted);
     return (
         <div className="flex flex-col pb-3 text-xs">
             <Info title="Cliente">
@@ -43,14 +49,49 @@ export default function PackageDetail({ orderSelected, onGetNf }: { orderSelecte
                 </Row>
                 <Row>
                     <RowItem field="Data:" value={orderSelected?.creationDate ? dayjs(orderSelected?.creationDate).format("DD/MM/YYYY HH:mm") : "-"} />
-                    <RowItem field="Status:" value={parsePackageStatus(orderSelected?._last_status?.name)} />
+                    <RowItem
+                        field="Status:"
+                        value={
+                            <div className="flex items-center gap-0.5">
+                                {parsePackageStatus(orderSelected?._last_status?.name)}{" "}
+                                {orderSelected?.__receiver && (
+                                    <Popover
+                                        placement="left"
+                                        content={
+                                            <div>
+                                                <div>
+                                                    Recebido por: <strong>{orderSelected?.__receiver}</strong>
+                                                </div>
+                                                {orderSelected?.__receiver_name && (
+                                                    <div>
+                                                        Descrição: <strong>{orderSelected?.__receiver_name || "-"}</strong>
+                                                    </div>
+                                                )}
+                                                <div className="mx-auto mt-3">
+                                                    <Image.PreviewGroup>
+                                                        {orderSelected?.__receiver_sign_pic && <Image height={100} width={100} className="object-cover" src={orderSelected?.__receiver_sign_pic} />}
+                                                        {orderSelected?.__receiver_sign_url && <Image height={100} width={100} className="object-cover" src={orderSelected?.__receiver_sign_url} />}
+                                                    </Image.PreviewGroup>
+                                                </div>
+                                            </div>
+                                        }
+                                    >
+                                        <MuiIcon icon={["muil", "info"]} color="#000000" width={10} />
+                                    </Popover>
+                                )}
+                            </div>
+                        }
+                    />
                 </Row>
                 <Row>
                     <RowItem field="Canal:" value={orderSelected?.shippingData?.logisticsInfo?.[0]?.deliveryChannel} />
                     <RowItem field="Transp:" value={orderSelected?.shippingData?.logisticsInfo?.[0]?.deliveryCompany || parsePackageStatus(orderSelected?.transportadora)} url={orderSelected?.tracking_url} />
                 </Row>
                 <Row>
+                    <RowItem field="Valor do frete:" value={currency(orderSelected?.shippingData?.logisticsInfo?.[0]?.sellingPrice || orderSelected?.shippingData?.logisticsInfo?.[0]?.price)} />
                     <RowItem field="Origem:" value={orderSelected?.__source} />
+                </Row>
+                <Row>
                     <RowItem field="Rastreio:" value={orderSelected?.tracking_code} />
                 </Row>
                 {orderSelected?.data_entrega_prevista && (
@@ -137,97 +178,3 @@ export default function PackageDetail({ orderSelected, onGetNf }: { orderSelecte
         </div>
     );
 }
-
-const Info = ({ title = "", children, actions }: any) => {
-    return (
-        <>
-            <div className="flex items-center justify-between font-bold mb-2">
-                {title}
-                {actions}
-            </div>
-            <div className="flex px-1 flex-col gap-1">{children}</div>
-        </>
-    );
-};
-const Row = ({ children }: any) => {
-    return <div className="flex items-center mb-1">{children}</div>;
-};
-const RowItem = ({ field = "", value = "", copy = false, col = false, url = null, nf = false, onNf = () => {} }) => {
-    return (
-        <div className={`flex ${col ? "w-full flex-col" : "w-1/2 items-center"}`}>
-            <div className="min-w-14 text-gray-400">{field}</div>
-            <div className={`font-semibold overflow-hidden overflow-ellipsis ${col ? "mt-0.5" : "ml-1"}`}>{typeof value === "boolean" ? <Tag color={value ? "green" : "red"}>{value ? "" : "Incompleto"}</Tag> : value || "-"}</div>
-            {value && url && (
-                <MuiIcon
-                    icon={["mui", "link"]}
-                    className="cursor-pointer mr-1 text-blue-600"
-                    onClick={() => {
-                        window.open(value, "__blank");
-                    }}
-                />
-            )}
-            {value && copy && (
-                <Tooltip title="Copiar">
-                    <MuiIcon
-                        icon={["mui", "copy_all"]}
-                        width={10}
-                        className="text-gray-500 hover:text-orange-500 cursor-pointer mr-1"
-                        onClick={() => {
-                            navigator.clipboard.writeText(value);
-                        }}
-                    />
-                </Tooltip>
-            )}
-            {value && nf && (
-                <Tooltip title="Baixar nota fiscal">
-                    <MuiIcon
-                        icon={["mui", "remove_red_eye"]}
-                        width={10}
-                        className="text-gray-500 hover:text-orange-500 cursor-pointer mr-1"
-                        onClick={() => {
-                            onNf();
-                        }}
-                    />
-                </Tooltip>
-            )}
-        </div>
-    );
-};
-const Item = ({ data, isRemoved }: any) => {
-    return (
-        <div className={"flex item-center group/item relative"}>
-            <img style={{ height: 45, width: 30 }} className="object-contain rounded-sm" src={data?.imageUrl} />
-            <div className={`flex justify-center flex-col flex-1 px-2 relative ${isRemoved ? "opacity-40" : ""}`}>
-                <span className="text-black font-semibold line-clamp-1">{data?.name}</span>
-                <div className="flex items-center justify-between mt-1">
-                    <div className="flex items-center gap-0.5">
-                        <span>SKU:</span>
-                        <div className="text-blue-950 font-semibold">{data?.sellerSku}</div>
-                    </div>
-                    <div className="flex items-center gap-0.5">
-                        <span>Ref:</span>
-                        <div className="text-blue-950 font-semibold flex items-center gap-1">
-                            {data?.refId}
-                            <Tooltip title="Copiar">
-                                <MuiIcon fontSize="small" click onClick={() => navigator.clipboard.writeText(data?.refId)} icon={["mui", "copy_all"]} className="text-gray-500 hover:text-blue-600" />
-                            </Tooltip>
-                        </div>
-                    </div>
-                    <div className={`flex items-center gap-0.5 ${isRemoved ? "opacity-0" : ""}`}>
-                        <span>Tam:</span>
-                        <div className="text-blue-950 font-semibold">-</div>
-                    </div>
-                    <div className={`flex items-center gap-0.5 ${isRemoved ? "opacity-0" : ""}`}>
-                        <span>Qtd:</span>
-                        <div className="text-blue-950 font-semibold">{data?.quantity || 0}</div>
-                    </div>
-                </div>
-            </div>
-            {isRemoved && (
-                <div className="absolute right-0 top-2">
-                    <Tag color="red">Removido</Tag>
-                </div>
-            )}
-        </div>
-    );
-};

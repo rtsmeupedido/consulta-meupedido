@@ -144,4 +144,9 @@ export const optionsSAC = [
         value: "7",
         fields: [{ value: "nome_cupom", label: "Nome do cupom" }],
     },
+    {
+        label: "Chargeback realizado pelo cliente",
+        value: "8",
+        fields: [{ value: "nome_cupom", label: "Nome do cupom" }],
+    },
 ];

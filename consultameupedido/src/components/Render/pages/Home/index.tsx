@@ -15,11 +15,14 @@ const Home = () => {
     const keyMsg = "msg-order-updatable";
     const [messageApi, contextHolder] = message.useMessage();
     const zafClient = useZaf();
+
     const { logout } = useAuth();
-    const [showLogout, setShowLogout] = useState(false);
-    const [versionApp, setVersionApp] = useState(null);
+
     const [brands, setBrands] = useState<any>([]);
     const [active, setActive] = useState("order");
+    const [versionApp, setVersionApp] = useState(null);
+    const [showLogout, setShowLogout] = useState(false);
+    const [permissions, setPermissions] = useState<any>(null);
 
     async function onGetNf(key: string) {
         messageApi.open({
@@ -71,6 +74,9 @@ const Home = () => {
                 setVersionApp(metadata?.version);
             }
         });
+        execFunc("check_user_permissions_zd").then(({ data }) => {
+            setPermissions(data);
+        });
     }
     const getBrands = async () => {
         return await list("mp_brands")
@@ -109,7 +115,7 @@ const Home = () => {
             </div>
             <Divider className="my-1" />
             <div className={active === "order" ? "block" : "hidden"}>
-                <OrderTracking onGetNf={onGetNf} brands={brands} />
+                <OrderTracking onGetNf={onGetNf} brands={brands} permissions={permissions} />
             </div>
             <div className={active === "product" ? "block" : "hidden"}>
                 <ProductDetails />

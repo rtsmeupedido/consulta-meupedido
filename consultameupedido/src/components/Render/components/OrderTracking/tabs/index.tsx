@@ -4,7 +4,7 @@ import PackageDetail from "./components/Detail";
 import Treatment from "./components/Treatment";
 import TimeLine from "./components/TimeLine";
 
-export default function Tab({ order, onGetNf }: { order: any; onGetNf: (str: string) => void }) {
+export default function Tab({ order, onGetNf, permissions }: { order: any; onGetNf: (str: string) => void; permissions: any }) {
     return (
         <Tabs
             defaultActiveKey="1"
@@ -48,7 +48,7 @@ export default function Tab({ order, onGetNf }: { order: any; onGetNf: (str: str
                                 height: "calc(100vh - 200px)",
                             }}
                         >
-                            <Treatment order={order} />
+                            <Treatment order={order} permissions={permissions} />
                         </div>
                     ),
                 },

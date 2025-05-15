@@ -10,7 +10,7 @@ import SyncPackage from "./components/SyncPackage";
 import { parseFilter, parsePackageStatus, saveLog } from "../../utils";
 import { message } from "antd";
 
-export default function OrderTracking({ onGetNf, brands }: { onGetNf: (str: string) => void; brands: any }) {
+export default function OrderTracking({ onGetNf, brands, permissions }: { onGetNf: (str: string) => void; brands: any; permissions: any }) {
     const [messageApi, contextHolder] = message.useMessage();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -58,9 +58,11 @@ export default function OrderTracking({ onGetNf, brands }: { onGetNf: (str: stri
                 <div className="flex gap-2 flex-col flex-1 overflow-hidden">
                     {!showSync && (
                         <HeaderSearch placeholder="Ex: email, CPF, pacote, pedido, telefone " onChange={(text) => handleFilter(text)} loading={loading}>
-                            <Button type="primary" onClick={() => setShowSync(true)}>
-                                Integrar pacotes
-                            </Button>
+                            {permissions?.integratePackage && (
+                                <Button type="primary" onClick={() => setShowSync(true)}>
+                                    Integrar pacotes
+                                </Button>
+                            )}
                         </HeaderSearch>
                     )}
                     <div className="flex border flex-1 h-full overflow-hidden">
@@ -135,7 +137,7 @@ export default function OrderTracking({ onGetNf, brands }: { onGetNf: (str: stri
                                     )}
                                 </div>
                                 <div className="flex w-1/2 h-full px-3 overflow-hidden">
-                                    {orderSelected?.orderId ? <Tab order={orderSelected} onGetNf={onGetNf} /> : <div className="flex items-center justify-center flex-1">Nenhum pacote selecionado</div>}
+                                    {orderSelected?.orderId ? <Tab order={orderSelected} onGetNf={onGetNf} permissions={permissions} /> : <div className="flex items-center justify-center flex-1">Nenhum pacote selecionado</div>}
                                 </div>
                             </>
                         )}

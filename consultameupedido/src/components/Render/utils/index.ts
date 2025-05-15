@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 import { create } from "../api";
 
 export const parseFilter = (text: string, returnType: boolean = false) => {
@@ -99,7 +100,6 @@ export const parsePackageStatus = (status: string) => {
 export function capitalize(s: string) {
     return String(s[0]).toUpperCase() + String(s).slice(1);
 }
-
 export function formatJsonField(field: string) {
     return field
         .normalize("NFD") // Remove acentos
@@ -114,7 +114,6 @@ interface logInterface {
     actionDescription?: string;
     actionCallDataSent?: any;
 }
-
 export const saveLog = async ({ actionCallType, actionCallName, actionDescription, actionCallDataSent }: logInterface) => {
     try {
         return await create("user_log", { actionCallType, actionCallName, name: actionDescription, actionCallDataSent });
@@ -122,7 +121,6 @@ export const saveLog = async ({ actionCallType, actionCallName, actionDescriptio
         return false;
     }
 };
-
 export const toCurrency = (v: number) => {
     return new Intl.NumberFormat("pt-BR", {
         style: "currency",
@@ -131,7 +129,6 @@ export const toCurrency = (v: number) => {
         maximumFractionDigits: 2,
     }).format(v);
 };
-
 export function formatCNPJ(cnpj: string) {
     cnpj = cnpj?.replace(/\D/g, ""); // Remove tudo que não for número
 
@@ -139,7 +136,6 @@ export function formatCNPJ(cnpj: string) {
 
     return cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, "$1.$2.$3/$4-$5");
 }
-
 export const formatBRL = (value: number) => {
     if (!value) return "";
     return new Intl.NumberFormat("pt-BR", {
@@ -147,7 +143,6 @@ export const formatBRL = (value: number) => {
         maximumFractionDigits: 2,
     }).format(value);
 };
-
 export const parseBRL = (value: string) => {
     if (!value) return 0;
     return parseFloat(value.replace(/\./g, "").replace(",", "."));

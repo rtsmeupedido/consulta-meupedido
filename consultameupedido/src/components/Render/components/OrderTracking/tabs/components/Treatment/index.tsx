@@ -1,7 +1,7 @@
 import NewItem from "./components/NewItem";
 import { Button, Modal } from "rtk-ux";
 import { useEffect, useState } from "react";
-import { create, execFunc, list, pushItem, remove, removeItem, update } from "../../../../../api";
+import { create, list, pushItem, remove, removeItem, update } from "../../../../../api";
 import ListGrid from "./components/ListGrid";
 import arrayToTree from "array-to-tree";
 import { options as defOptions } from "./util";
@@ -9,23 +9,20 @@ import { saveLog } from "../../../../../utils";
 
 type Props = {
     order: any;
+    permissions: any;
 };
 
-export default function Treatment({ order }: Props) {
+export default function Treatment({ order, permissions }: Props) {
     const [options, setOptions] = useState<any>([]);
     const [optionsFlat, setOptionsFlat] = useState<any>([]);
     const [isOpenNew, setIsOpenNew] = useState(false);
     const [loading, setLoading] = useState(true);
     const [isReadOnly, setIsReadOnly] = useState(false);
-    const [permissions, setPermissions] = useState<any>(null);
     const [data, setData] = useState([]);
     const [selected, setSelected] = useState<any>(null);
 
     async function getPermissionsAndItems() {
         try {
-            await execFunc("check_user_permissions_zd").then(({ data }) => {
-                setPermissions(data);
-            });
             await list("classificacoes_tratativas", {}, undefined, "query", { __created: 1 }).then(({ data }) => {
                 setOptionsFlat(data);
                 const formatData = (data || [])?.map((e: any) => ({ ...e, label: e?.name, value: e?._id }));
